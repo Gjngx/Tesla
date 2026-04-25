@@ -409,14 +409,14 @@ const script = () => {
         }
       } else if (inst.direction == -1) {
         if (inst.scroll > ($(this.el).height() * 3)) {
-          let heightHeader = $(this.el).outerHeight();
+          // let heightHeader = $(this.el).outerHeight();
           // $('.home-intro').css('top', heightHeader + "px");
           $(this.el).addClass("on-hide");
           $(this.el).removeClass("on-hide");
         }
       }
       else {
-        let heightHeader = $(this.el).outerHeight();
+        // let heightHeader = $(this.el).outerHeight();
         // $('.home-intro').css('top', heightHeader + "px");
         $(this.el).removeClass("on-hide");
       }
@@ -561,17 +561,20 @@ const script = () => {
         if (swiperEl) {
           const swiper = new Swiper(swiperEl, {
             slidesPerView: 1,
-            spaceBetween: cvUnit(8, 'rem'),
+            spaceBetween: 0,
             loop: true,
             effect: "fade",
+            fadeEffect: {
+              crossFade: true,
+            },
             speed: 1500,
             autoplay: {
               delay: 5000,
               disableOnInteraction: false,
             },
             navigation: {
-              nextEl: $(this).find('.swiper-button-next, [data-swiper="next"]')[0],
-              prevEl: $(this).find('.swiper-button-prev, [data-swiper="prev"]')[0],
+              nextEl: $(this).find('.swiper-button-next')[0],
+              prevEl: $(this).find('.swiper-button-prev')[0],
             },
           });
         }
@@ -591,6 +594,8 @@ const script = () => {
       }
       setup() {
         console.log('Home intro setup');
+        // let heightHeader = $('.header').outerHeight();
+        // $('.home-intro-main').css('top', heightHeader + "px");
       }
       animationReveal() {
         this.SplitText();
@@ -638,10 +643,11 @@ const script = () => {
 
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: $(this).find('.home-cur-inner'),
+            trigger: $(this).find('.home-cur-anim'),
             start: 'top top',
             end: 'bottom bottom',
             scrub: true,
+            markers: true,
           },
         });
         
@@ -659,6 +665,62 @@ const script = () => {
             opacity: "-=0.2",
             ease: 'none'
           }, `step${i}`);
+        });
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'home-ib-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('Home ib setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'home-video-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('Home video setup');
+      }
+      animationReveal() {
+        this.videoAnimation();
+      }
+      interact() {
+      }
+      videoAnimation() {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.home-video-progress'),
+            start: 'top top+=90%',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
+        tl.to($(this).find('.home-video-anim'), {
+          width: '100%',
+          height: 'calc(100vh - 6.4rem)',
+          ease: 'none'
         });
       }
       destroy() {
