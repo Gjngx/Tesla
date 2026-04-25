@@ -374,13 +374,12 @@ const script = () => {
     }
     init(data) {
       this.el = document.querySelector('.header');
-      console.log('Header init');
-      // if (viewport.w <= 991) {
-      //   this.toggleNav();
-      // }
-      // else {
-      //   this.toggleDropdownDown();
-      // }
+      if (viewport.w <= 991) {
+        this.toggleNav();
+      }
+      else {
+        this.toggleDropdownDown();
+      }
     }
     updateOnScroll(inst) {
       this.toggleHide(inst);
@@ -406,14 +405,19 @@ const script = () => {
       if (inst.direction == 1) {
         if (inst.scroll > ($(this.el).height() * 3)) {
           $(this.el).addClass('on-hide');
+          // $('.home-intro').css('top', 0 + "px");
         }
       } else if (inst.direction == -1) {
         if (inst.scroll > ($(this.el).height() * 3)) {
+          let heightHeader = $(this.el).outerHeight();
+          // $('.home-intro').css('top', heightHeader + "px");
           $(this.el).addClass("on-hide");
           $(this.el).removeClass("on-hide");
         }
       }
       else {
+        let heightHeader = $(this.el).outerHeight();
+        // $('.home-intro').css('top', heightHeader + "px");
         $(this.el).removeClass("on-hide");
       }
     }
@@ -432,19 +436,44 @@ const script = () => {
     }
     toggleNav() {
       $(this.el).find('.header-toggle').on('click', this.handleClick.bind(this));
-      $(window).on('click', (e) => {
-        if (!$(e.target).closest('.header-nav, .header-toggle').length) {
-          this.close();
-        }
-        else if ($(e.target).closest('.header-nav-link-inner:not(.dropdown, .child) , .header-logo, .header-nav-btn').length) {
-          setTimeout(() => this.close(), 200);
-        }
-        else return;
-      });
     }
     handleClick(e) {
       e.preventDefault();
       this.isOpen ? this.close() : this.open();
+    }
+    toggleDropdownDown() {
+      const $links = $(this.el).find('.header-menu-link.has-dropdown');
+      
+      $links.on('click', (e) => {
+        e.preventDefault();
+        const $this = $(e.currentTarget);
+        const $dropdown = $this.closest('.header-menu').find('.header-menu-dropdown-desktop');
+        
+        $this.toggleClass('active');
+        $dropdown.toggleClass('active');
+
+        if ($this.hasClass('active')) {
+          $('.backdrop').addClass('active');
+          smoothScroll.lenis.stop();
+        } else {
+          $('.backdrop').removeClass('active');
+          smoothScroll.lenis.start();
+        }
+
+      });
+
+      $(document).on('click', (e) => {
+        const $target = $(e.target);
+        if (!$target.closest('.header-menu-link.has-dropdown').length && !$target.closest('.header-menu-dropdown-desktop').length) {
+          const $activeLinks = $(this.el).find('.header-menu-link.has-dropdown.active');
+          if ($activeLinks.length) {
+            $activeLinks.removeClass('active');
+            $(this.el).find('.header-menu-dropdown-desktop').removeClass('active');
+            $('.backdrop').removeClass('active');
+            smoothScroll.lenis.start();
+          }
+        }
+      });
     }
     open() {
       if (this.isOpen) return;
@@ -510,12 +539,127 @@ const script = () => {
         this.onTrigger = () => {
           this.setup();
           this.animationReveal();
+          this.interact();
         }
       }
       setup() {
         console.log('Home hero setup');
       }
       animationReveal() {
+      }
+      interact() {
+        this.initSlider();
+      }
+      initSlider(){
+        $(this).find('[data-swiper=swiper]').addClass('swiper');
+        $(this).find('[data-swiper=wrapper]').addClass('swiper-wrapper');
+        $(this).find('[data-swiper=slide]').addClass('swiper-slide');
+        $(this).find('[data-swiper=prev]').addClass('swiper-button-prev');
+        $(this).find('[data-swiper=next]').addClass('swiper-button-next');
+
+        const swiperEl = $(this).find('.home-hero-slide')[0];
+        if (swiperEl) {
+          const swiper = new Swiper(swiperEl, {
+            slidesPerView: 1,
+            spaceBetween: cvUnit(8, 'rem'),
+            loop: true,
+            effect: "fade",
+            speed: 1500,
+            autoplay: {
+              delay: 5000,
+              disableOnInteraction: false,
+            },
+            navigation: {
+              nextEl: $(this).find('.swiper-button-next, [data-swiper="next"]')[0],
+              prevEl: $(this).find('.swiper-button-prev, [data-swiper="prev"]')[0],
+            },
+          });
+        }
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'home-intro-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('Home intro setup');
+      }
+      animationReveal() {
+        this.SplitText();
+      }
+      interact() {
+      }
+      SplitText() {
+        const textSplitting = SplitText.create('.home-intro-text .txt', { type: 'words,chars' });
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.home-intro-text',
+            start: 'top top+=70%',
+            end:'top top-=30%',
+            scrub: true,
+          },
+        })
+        tl.fromTo(textSplitting.chars, { opacity: 0.2 }, { opacity: 1, ease: 'power2.inOut', stagger: 0.2 })
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'home-cur-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('Home cur setup');
+      }
+      animationReveal() {
+        this.cardAnimation();
+      }
+      interact() {
+      }
+      cardAnimation() {
+        const allCards = $(this).find('.home-cur-card');
+        const cards = $(this).find('.home-cur-card:not(:first-child)');
+        
+        gsap.set(allCards, { transformOrigin: "top center" });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.home-cur-inner'),
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
+        
+        cards.each((i, el) => {
+          const targetCards = cards.slice(i);
+          const previousCards = allCards.slice(0, i + 1);
+          
+          tl.to(targetCards, {
+            yPercent: -(i + 1) * 90,
+            ease: 'none'
+          }, `step${i}`);
+
+          tl.to(previousCards, {
+            scale: "-=0.1",
+            opacity: "-=0.2",
+            ease: 'none'
+          }, `step${i}`);
+        });
       }
       destroy() {
         super.destroy();
