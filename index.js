@@ -647,7 +647,6 @@ const script = () => {
             start: 'top top',
             end: 'bottom bottom',
             scrub: true,
-            markers: true,
           },
         });
         
@@ -711,8 +710,8 @@ const script = () => {
       videoAnimation() {
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: $(this).find('.home-video-progress'),
-            start: 'top top+=90%',
+            trigger: $(this).find('.home-video'),
+            start: 'top top+=85%',
             end: 'bottom bottom',
             scrub: true,
           },
