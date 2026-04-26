@@ -551,32 +551,21 @@ const script = () => {
         this.initSlider();
       }
       initSlider(){
-        $(this).find('[data-swiper=swiper]').addClass('swiper');
-        $(this).find('[data-swiper=wrapper]').addClass('swiper-wrapper');
-        $(this).find('[data-swiper=slide]').addClass('swiper-slide');
-        $(this).find('[data-swiper=prev]').addClass('swiper-button-prev');
-        $(this).find('[data-swiper=next]').addClass('swiper-button-next');
+        $(this).find('[data-embla=embla]').addClass('embla__viewport');
+        $(this).find('[data-embla=container]').addClass('embla__container');
+        $(this).find('[data-embla=slide]').addClass('embla__slide');
 
-        const swiperEl = $(this).find('.home-hero-slide')[0];
-        if (swiperEl) {
-          const swiper = new Swiper(swiperEl, {
-            slidesPerView: 1,
-            spaceBetween: 0,
-            loop: true,
-            effect: "fade",
-            fadeEffect: {
-              crossFade: true,
-            },
-            speed: 1500,
-            autoplay: {
-              delay: 5000,
-              disableOnInteraction: false,
-            },
-            navigation: {
-              nextEl: $(this).find('.swiper-button-next')[0],
-              prevEl: $(this).find('.swiper-button-prev')[0],
-            },
-          });
+        const slidesInner = $(this).find('.home-hero-slide').get(0);
+        const prevBtn = $(this).find('.ctrl-btn-prev').get(0);
+        const nextBtn = $(this).find('.ctrl-btn-next').get(0);
+
+        this.emblaApi = EmblaCarousel(slidesInner, { loop: true }, [
+          EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false }),
+          EmblaCarouselFade()
+        ]);
+        
+        if (prevBtn && nextBtn) {
+          this.prevNextButtons = new PrevNextButtons(this.emblaApi, prevBtn, nextBtn);
         }
       }
       destroy() {
@@ -712,7 +701,7 @@ const script = () => {
           scrollTrigger: {
             trigger: $(this).find('.home-video'),
             start: 'top top+=85%',
-            end: 'bottom bottom',
+            end: 'bottom-=25% bottom',
             scrub: true,
           },
         });
@@ -721,6 +710,61 @@ const script = () => {
           height: 'calc(100vh - 6.4rem)',
           ease: 'none'
         });
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'home-learn-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('Home learn setup');
+      }
+      animationReveal() {
+        this.learnAnimation();
+      }
+      interact() {
+      }
+      learnAnimation() {
+        const slideInner = $(this).find('.home-learn-slide-inner');
+        const slideWrapper = $(this).find('.home-learn-slide');
+        const contentItems = $(this).find('.home-learn-content-item');
+        const totalItems = contentItems.length;
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.home-learn-progress'),
+            start: 'top bottom',
+            end: 'bottom bottom',
+            scrub: true,
+            onUpdate: (self) => {
+              if (totalItems > 0) {
+                // Tính toán index dựa trên phần trăm scroll (0 -> 1)
+                let index = Math.round(self.progress * (totalItems - 1));
+                
+                if (index !== this.currentIndex) {
+                  contentItems.removeClass('active');
+                  contentItems.eq(index).addClass('active');
+                  this.currentIndex = index;
+                }
+              }
+            }
+          },
+        });
+
+        if (slideInner.length && slideWrapper.length) {
+          tl.to(slideInner, {
+            y: () => -(slideInner[0].scrollHeight - slideWrapper.height()),
+            ease: 'none'
+          });
+        }
       }
       destroy() {
         super.destroy();
