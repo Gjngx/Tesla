@@ -823,9 +823,6 @@ const script = () => {
         }
       }
       setup() {
-        console.log('Home intro setup');
-        // let heightHeader = $('.header').outerHeight();
-        // $('.home-intro-main').css('top', heightHeader + "px");
       }
       animationReveal() {
         this.SplitText();
@@ -842,7 +839,7 @@ const script = () => {
             scrub: true,
           },
         })
-        tl.fromTo(textSplitting.chars, { opacity: 0.2 }, { opacity: 1, ease: 'power2.inOut', stagger: 0.2 })
+        tl.fromTo(textSplitting.chars, { opacity: 0.2 }, { opacity: 1, ease: 'none', stagger: 0.2 })
       }
       destroy() {
         super.destroy();
