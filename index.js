@@ -1096,6 +1096,8 @@ const script = () => {
         $(this).find('[data-embla=embla]').addClass('embla__viewport');
         $(this).find('[data-embla=container]').addClass('embla__container');
         $(this).find('[data-embla=slide]').addClass('embla__slide');
+        $(this).find('[data-anim=anim-ctrl-progressing]').addClass('anim-ctrl-progressing');
+
 
         const slidesInner = $(this).find('.home-testi-slide-text').get(0);
         const prevBtn = $(this).find('.home-testi-ctrl-prev').get(0);
@@ -1219,6 +1221,13 @@ const script = () => {
           const updatePagi = () => {
             const currentSlide = this.emblaApi.selectedScrollSnap() + 1;
             pagiNumber.text(currentSlide < 10 ? `0${currentSlide}` : currentSlide);
+
+            const progressEl = $(this).find('[data-anim=anim-ctrl-progressing]').get(0);
+            if (progressEl) {
+              progressEl.classList.remove('anim-ctrl-progressing');
+              void progressEl.offsetWidth;
+              progressEl.classList.add('anim-ctrl-progressing');
+            }
           };
           
           updatePagi();
