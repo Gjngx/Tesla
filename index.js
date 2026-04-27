@@ -1090,6 +1090,140 @@ const script = () => {
       animationReveal() {
       }
       interact() {
+        this.initSlideAnimation();
+      }
+      initSlideAnimation() {
+        $(this).find('[data-embla=embla]').addClass('embla__viewport');
+        $(this).find('[data-embla=container]').addClass('embla__container');
+        $(this).find('[data-embla=slide]').addClass('embla__slide');
+
+        const slidesInner = $(this).find('.home-testi-slide-text').get(0);
+        const prevBtn = $(this).find('.home-testi-ctrl-prev').get(0);
+        const nextBtn = $(this).find('.home-testi-ctrl-next').get(0);
+        
+        const pagiNumber = $(this).find('[data-pagi="number"]');
+        const pagiTotal = $(this).find('[data-total="number"]');
+
+        this.emblaApi = EmblaCarousel(slidesInner, {}, [
+          EmblaCarouselFade(),
+          EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
+        ]);
+
+        const slidesName = $(this).find('.home-testi-name-slide').get(0);
+        if (slidesName) {
+          $(slidesName).addClass('embla__viewport');
+          $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
+          $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
+          
+          this.emblaApiName = EmblaCarousel(slidesName, {}, [
+            EmblaCarouselFade()
+          ]);
+          
+          const syncMainToName = () => {
+            if (this.emblaApiName && this.emblaApi) {
+              if (this.emblaApiName.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
+                this.emblaApiName.scrollTo(this.emblaApi.selectedScrollSnap());
+              }
+            }
+          };
+          
+          // Hàm đồng bộ Name -> Main
+          const syncNameToMain = () => {
+            if (this.emblaApiName && this.emblaApi) {
+              if (this.emblaApi.selectedScrollSnap() !== this.emblaApiName.selectedScrollSnap()) {
+                this.emblaApi.scrollTo(this.emblaApiName.selectedScrollSnap());
+              }
+            }
+          };
+
+          this.emblaApi.on('select', syncMainToName);
+          this.emblaApiName.on('select', syncNameToMain);
+        }
+
+        const slidesAvatar = $(this).find('.home-testi-avatar-slide').get(0);
+        if (slidesAvatar) {
+          $(slidesAvatar).addClass('embla__viewport');
+          $(slidesAvatar).find('.home-testi-avatar-slide-inner').addClass('embla__container');
+          $(slidesAvatar).find('.home-testi-avatar-slide-item').addClass('embla__slide');
+          
+          this.emblaApiAvatar = EmblaCarousel(slidesAvatar);
+          
+          const syncMainToAvatar = () => {
+            if (this.emblaApiAvatar && this.emblaApi) {
+              if (this.emblaApiAvatar.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
+                this.emblaApiAvatar.scrollTo(this.emblaApi.selectedScrollSnap());
+              }
+            }
+          };
+          
+          const syncAvatarToMain = () => {
+            if (this.emblaApiAvatar && this.emblaApi) {
+              if (this.emblaApi.selectedScrollSnap() !== this.emblaApiAvatar.selectedScrollSnap()) {
+                this.emblaApi.scrollTo(this.emblaApiAvatar.selectedScrollSnap());
+              }
+            }
+          };
+
+          this.emblaApi.on('select', syncMainToAvatar);
+          this.emblaApiAvatar.on('select', syncAvatarToMain);
+        }
+
+        // Setup Background Slider
+        const slidesBg = $(this).find('.home-testi-bg-slide').get(0);
+        if (slidesBg) {
+          const bgInner = $(slidesBg).find('.home-testi-bg-slide-inner');
+          const bgItem = $(slidesBg).find('.home-testi-bg-slide-item').first();
+          
+          if (bgInner.length && bgItem.length && this.emblaApi) {
+            const totalSlides = this.emblaApi.scrollSnapList().length;
+            const currentCount = bgInner.find('.home-testi-bg-slide-item').length;
+            for (let i = currentCount; i < totalSlides; i++) {
+              bgInner.append(bgItem.clone());
+            }
+          }
+          
+          $(slidesBg).addClass('embla__viewport');
+          $(slidesBg).find('.home-testi-bg-slide-inner').addClass('embla__container');
+          $(slidesBg).find('.home-testi-bg-slide-item').addClass('embla__slide');
+          
+          this.emblaApiBg = EmblaCarousel(slidesBg);
+          
+          const syncMainToBg = () => {
+            if (this.emblaApiBg && this.emblaApi) {
+              if (this.emblaApiBg.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
+                this.emblaApiBg.scrollTo(this.emblaApi.selectedScrollSnap());
+              }
+            }
+          };
+          
+          const syncBgToMain = () => {
+            if (this.emblaApiBg && this.emblaApi) {
+              if (this.emblaApi.selectedScrollSnap() !== this.emblaApiBg.selectedScrollSnap()) {
+                this.emblaApi.scrollTo(this.emblaApiBg.selectedScrollSnap());
+              }
+            }
+          };
+
+          this.emblaApi.on('select', syncMainToBg);
+          this.emblaApiBg.on('select', syncBgToMain);
+        }
+
+        if (prevBtn && nextBtn) {
+          this.prevNextButtons = new PrevNextButtons(this.emblaApi, prevBtn, nextBtn);
+        }
+
+        if (this.emblaApi) {
+          const totalSlides = this.emblaApi.scrollSnapList().length;
+          pagiTotal.text(totalSlides < 10 ? `0${totalSlides}` : totalSlides);
+          
+          const updatePagi = () => {
+            const currentSlide = this.emblaApi.selectedScrollSnap() + 1;
+            pagiNumber.text(currentSlide < 10 ? `0${currentSlide}` : currentSlide);
+          };
+          
+          updatePagi();
+          this.emblaApi.on('select', updatePagi);
+        }
       }
       destroy() {
         super.destroy();
