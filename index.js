@@ -1041,21 +1041,27 @@ const script = () => {
         const fgInner = $(this).find('.home-blog-slide-inner');
         const fgWrapper = $(this).find('.home-blog-slide');
         
-        const bgInner = $(this).find('.home-blog-bg-slide-inner');
-        const bgWrapper = $(this).find('.home-blog-bg-slide');
+        const bgItems = $(this).find('.home-blog-bg-slide-item');
 
         if (fgInner.length && fgWrapper.length) {
           tl.to(fgInner, {
             x: () => -(fgInner[0].scrollWidth - fgWrapper.width()),
-            ease: 'none'
+            ease: 'none',
+            duration: 1
           }, 0); 
         }
 
-        if (bgInner.length && bgWrapper.length) {
-          tl.to(bgInner, {
-            x: () => -(bgInner[0].scrollWidth - bgWrapper.width()),
-            ease: 'none'
-          }, 0); 
+        if (bgItems.length > 1) {
+          gsap.set(bgItems.slice(1), { clipPath: 'inset(0% 0% 0% 100%)' });
+          
+          const step = 1 / (bgItems.length - 1);
+          bgItems.slice(1).each((index, item) => {
+            tl.to(item, {
+              clipPath: 'inset(0% 0% 0% 0%)',
+              ease: 'none',
+              duration: step
+            }, index * step);
+          });
         }
 
         $(this).find('.home-blog-btn-skip').on('click', (e) => {
