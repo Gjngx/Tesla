@@ -1,4 +1,20 @@
 const script = () => {
+  const style = document.createElement('style');
+  style.innerHTML = `
+      html {
+        -webkit-tap-highlight-color: transparent;
+      }
+      .debug-grid,
+      .container-column {
+        display: none;
+      }
+      [data-init-hidden],
+      [data-init-loader] {
+        opacity: 0;
+      }
+    `;
+  document.head.appendChild(style);
+
   $.easing.exponentialEaseOut = function (t) {
     return Math.min(1, 1.001 - Math.pow(2, -10 * t));
   };
@@ -539,7 +555,7 @@ const script = () => {
         case "footer":
           cursor.removeClass("hidden");
           cursor.addClass("on-footer");
-          
+
           // Update text from data-footer-text
           const footerTarget = $(hoverElements[hoverElements.length - 1]);
           const footerText = footerTarget.attr("data-footer-text");
@@ -670,14 +686,14 @@ const script = () => {
     }
     toggleDropdownDown() {
       const $allLinks = $(this.el).find('.header-menu-link.has-dropdown');
-      
+
       $allLinks.on('click', (e) => {
         e.preventDefault();
         const $this = $(e.currentTarget);
         const $menu = $this.closest('.header-menu');
         const $links = $menu.find('.header-menu-link.has-dropdown');
         const index = $links.index($this);
-        
+
         const $dropdown = $menu.find('.header-menu-dropdown-desktop');
         const $inners = $dropdown.find('.header-menu-dropdown-inner');
 
@@ -791,7 +807,7 @@ const script = () => {
       interact() {
         this.initSlider();
       }
-      initSlider(){
+      initSlider() {
         $(this).find('[data-embla=embla]').addClass('embla__viewport');
         $(this).find('[data-embla=container]').addClass('embla__container');
         $(this).find('[data-embla=slide]').addClass('embla__slide');
@@ -804,7 +820,7 @@ const script = () => {
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false }),
           EmblaCarouselFade()
         ]);
-        
+
         if (prevBtn && nextBtn) {
           this.prevNextButtons = new PrevNextButtons(this.emblaApi, prevBtn, nextBtn);
         }
@@ -835,7 +851,7 @@ const script = () => {
           scrollTrigger: {
             trigger: '.home-intro-text',
             start: 'top top+=70%',
-            end:'top top-=30%',
+            end: 'top top-=30%',
             scrub: true,
           },
         })
@@ -865,7 +881,7 @@ const script = () => {
       cardAnimation() {
         const allCards = $(this).find('.home-cur-card');
         const cards = $(this).find('.home-cur-card:not(:first-child)');
-        
+
         gsap.set(allCards, { transformOrigin: "top center" });
 
         const tl = gsap.timeline({
@@ -876,11 +892,11 @@ const script = () => {
             scrub: true,
           },
         });
-        
+
         cards.each((i, el) => {
           const targetCards = cards.slice(i);
           const previousCards = allCards.slice(0, i + 1);
-          
+
           tl.to(targetCards, {
             yPercent: -(i + 1) * 90,
             ease: 'none'
@@ -986,7 +1002,7 @@ const script = () => {
               if (totalItems > 0) {
                 // Tính toán index dựa trên phần trăm scroll (0 -> 1)
                 let index = Math.round(self.progress * (totalItems - 1));
-                
+
                 if (index !== this.currentIndex) {
                   contentItems.removeClass('active');
                   contentItems.eq(index).addClass('active');
@@ -1037,25 +1053,25 @@ const script = () => {
 
         const fgInner = $(this).find('.home-blog-slide-inner');
         const fgWrapper = $(this).find('.home-blog-slide');
-        
+
         const bgItems = $(this).find('.home-blog-bg-slide-item');
 
         if (fgInner.length && fgWrapper.length) {
           tl.to(fgInner, {
             x: () => -(fgInner[0].scrollWidth - fgWrapper.width()),
-            ease: 'none',
+            ease: 'power3.inOut',
             duration: 1
-          }, 0); 
+          }, 0);
         }
 
         if (bgItems.length > 1) {
           gsap.set(bgItems.slice(1), { clipPath: 'inset(0% 0% 0% 100%)' });
-          
+
           const step = 1 / (bgItems.length - 1);
           bgItems.slice(1).each((index, item) => {
             tl.to(item, {
               clipPath: 'inset(0% 0% 0% 0%)',
-              ease: 'none',
+              ease: 'power3.inOut',
               duration: step
             }, index * step);
           });
@@ -1099,7 +1115,7 @@ const script = () => {
         const slidesInner = $(this).find('.home-testi-slide-text').get(0);
         const prevBtn = $(this).find('.home-testi-ctrl-prev').get(0);
         const nextBtn = $(this).find('.home-testi-ctrl-next').get(0);
-        
+
         const pagiNumber = $(this).find('[data-pagi="number"]');
         const pagiTotal = $(this).find('[data-total="number"]');
 
@@ -1113,11 +1129,11 @@ const script = () => {
           $(slidesName).addClass('embla__viewport');
           $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
           $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
-          
+
           this.emblaApiName = EmblaCarousel(slidesName, {}, [
             EmblaCarouselFade()
           ]);
-          
+
           const syncMainToName = () => {
             if (this.emblaApiName && this.emblaApi) {
               if (this.emblaApiName.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
@@ -1125,7 +1141,7 @@ const script = () => {
               }
             }
           };
-          
+
           // Hàm đồng bộ Name -> Main
           const syncNameToMain = () => {
             if (this.emblaApiName && this.emblaApi) {
@@ -1144,9 +1160,9 @@ const script = () => {
           $(slidesAvatar).addClass('embla__viewport');
           $(slidesAvatar).find('.home-testi-avatar-slide-inner').addClass('embla__container');
           $(slidesAvatar).find('.home-testi-avatar-slide-item').addClass('embla__slide');
-          
+
           this.emblaApiAvatar = EmblaCarousel(slidesAvatar);
-          
+
           const syncMainToAvatar = () => {
             if (this.emblaApiAvatar && this.emblaApi) {
               if (this.emblaApiAvatar.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
@@ -1154,7 +1170,7 @@ const script = () => {
               }
             }
           };
-          
+
           const syncAvatarToMain = () => {
             if (this.emblaApiAvatar && this.emblaApi) {
               if (this.emblaApi.selectedScrollSnap() !== this.emblaApiAvatar.selectedScrollSnap()) {
@@ -1172,7 +1188,7 @@ const script = () => {
         if (slidesBg) {
           const bgInner = $(slidesBg).find('.home-testi-bg-slide-inner');
           const bgItem = $(slidesBg).find('.home-testi-bg-slide-item').first();
-          
+
           if (bgInner.length && bgItem.length && this.emblaApi) {
             const totalSlides = this.emblaApi.scrollSnapList().length;
             const currentCount = bgInner.find('.home-testi-bg-slide-item').length;
@@ -1180,13 +1196,13 @@ const script = () => {
               bgInner.append(bgItem.clone());
             }
           }
-          
+
           $(slidesBg).addClass('embla__viewport');
           $(slidesBg).find('.home-testi-bg-slide-inner').addClass('embla__container');
           $(slidesBg).find('.home-testi-bg-slide-item').addClass('embla__slide');
-          
+
           this.emblaApiBg = EmblaCarousel(slidesBg);
-          
+
           const syncMainToBg = () => {
             if (this.emblaApiBg && this.emblaApi) {
               if (this.emblaApiBg.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
@@ -1194,7 +1210,7 @@ const script = () => {
               }
             }
           };
-          
+
           const syncBgToMain = () => {
             if (this.emblaApiBg && this.emblaApi) {
               if (this.emblaApi.selectedScrollSnap() !== this.emblaApiBg.selectedScrollSnap()) {
@@ -1214,7 +1230,7 @@ const script = () => {
         if (this.emblaApi) {
           const totalSlides = this.emblaApi.scrollSnapList().length;
           pagiTotal.text(totalSlides < 10 ? `0${totalSlides}` : totalSlides);
-          
+
           const updatePagi = () => {
             const currentSlide = this.emblaApi.selectedScrollSnap() + 1;
             pagiNumber.text(currentSlide < 10 ? `0${currentSlide}` : currentSlide);
@@ -1226,7 +1242,7 @@ const script = () => {
               progressEl.classList.add('anim-ctrl-progressing');
             }
           };
-          
+
           updatePagi();
           this.emblaApi.on('select', updatePagi);
         }
@@ -1354,7 +1370,7 @@ const script = () => {
       registry[pageName] = new PageManager(pageConfig[pageName]);
     }
     initFooter();
-    
+
     // Gọi lại updateHtml để chuột nhận diện đúng các phần tử DOM sau khi page đã setup xong
     if (typeof mouse !== 'undefined') {
       mouse.updateHtml();

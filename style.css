@@ -1,13 +1,1 @@
-html {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.debug-grid,
-.container-column {
-  display: none;
-}
-
-[data-init-hidden],
-[data-init-loader] {
-  opacity: 0;
-}
+/* Styles moved to index.js for demo domain restriction */
