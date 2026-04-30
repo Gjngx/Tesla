@@ -237,6 +237,8 @@ const script = () => {
     constructor(list, duration = 40) {
       this.list = list;
       this.duration = duration;
+      this.animations = [];
+      this.currentRate = 1;
     }
     setup(isReverse) {
       const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
@@ -244,6 +246,7 @@ const script = () => {
       let itemClone = this.list.find('[data-marquee="item"]').clone();
       let itemWidth = this.list.find('[data-marquee="item"]').width();
       this.list.html('');
+      const items = [];
       new Array(cloneAmount).fill().forEach(() => {
         let html = itemClone.clone()
         html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
@@ -252,7 +255,30 @@ const script = () => {
         }
         html.addClass('anim-marquee');
         this.list.append(html);
+        items.push(html[0]);
       });
+
+      setTimeout(() => {
+        this.animations = items.flatMap(el => el.getAnimations());
+        
+        gsap.ticker.add(() => {
+           let velocity = smoothScroll.scroller ? smoothScroll.scroller.velocity : 0;
+           
+           let targetRate = 1;
+           if (velocity < 0) {
+               targetRate = 1 + (velocity * 0.5); 
+           } else {
+               targetRate = 1 + (velocity * 0.15);
+           }
+           targetRate = Math.max(-3, Math.min(targetRate, 3));
+           
+           this.currentRate = lerp(this.currentRate, targetRate, 0.08);
+           
+           this.animations.forEach(anim => {
+             if(anim) anim.playbackRate = this.currentRate;
+           });
+        });
+      }, 50);
     }
   }
   class SmoothScroll {
@@ -687,8 +713,7 @@ const script = () => {
     toggleDropdownDown() {
       const $allLinks = $(this.el).find('.header-menu-link.has-dropdown');
 
-      $allLinks.on('click', (e) => {
-        e.preventDefault();
+      $allLinks.on('mouseenter', (e) => {
         const $this = $(e.currentTarget);
         const $menu = $this.closest('.header-menu');
         const $links = $menu.find('.header-menu-link.has-dropdown');
@@ -697,15 +722,8 @@ const script = () => {
         const $dropdown = $menu.find('.header-menu-dropdown-desktop');
         const $inners = $dropdown.find('.header-menu-dropdown-inner');
 
-        if ($this.hasClass('active')) {
-          // Đang mở -> Đóng lại
-          $this.removeClass('active');
-          $dropdown.removeClass('active');
-          $inners.removeClass('active');
-          $('.backdrop').removeClass('active');
-          smoothScroll.lenis.start();
-        } else {
-          // Đang đóng hoặc chọn tab khác -> Mở tab mới
+        if (!$this.hasClass('active')) {
+          // Mở tab mới
           $links.removeClass('active');
           $this.addClass('active');
 
@@ -718,17 +736,29 @@ const script = () => {
         }
       });
 
+      const closeDropdown = () => {
+        const $activeLinks = $(this.el).find('.header-menu-link.has-dropdown.active');
+        if ($activeLinks.length) {
+          $activeLinks.removeClass('active');
+          $(this.el).find('.header-menu-dropdown-desktop').removeClass('active');
+          $(this.el).find('.header-menu-dropdown-inner').removeClass('active');
+          $('.backdrop').removeClass('active');
+          smoothScroll.lenis.start();
+        }
+      };
+
+      $allLinks.on('click', (e) => {
+        e.preventDefault();
+      });
+
+      $(this.el).find('.header-menu-link:not(.has-dropdown)').on('mouseenter', closeDropdown);
+      $(this.el).find('.header-menu-dropdown-desktop').on('mouseleave', closeDropdown);
+      $(this.el).on('mouseleave', closeDropdown);
+
       $(document).on('click', (e) => {
         const $target = $(e.target);
         if (!$target.closest('.header-menu-link.has-dropdown').length && !$target.closest('.header-menu-dropdown-desktop').length) {
-          const $activeLinks = $(this.el).find('.header-menu-link.has-dropdown.active');
-          if ($activeLinks.length) {
-            $activeLinks.removeClass('active');
-            $(this.el).find('.header-menu-dropdown-desktop').removeClass('active');
-            $(this.el).find('.header-menu-dropdown-inner').removeClass('active');
-            $('.backdrop').removeClass('active');
-            smoothScroll.lenis.start();
-          }
+          closeDropdown();
         }
       });
     }
