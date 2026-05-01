@@ -1168,7 +1168,7 @@ const script = () => {
           ]);
 
           this.tweenSplitTextName = new TweenSplitText(this.emblaApiName, {
-            titleSelector: '.home-testi-name-text .lable, .home-testi-name-pos .lable'
+            titleSelector: '.home-testi-name-text .label, .home-testi-name-pos .label'
           });
 
           const syncMainToName = () => {
