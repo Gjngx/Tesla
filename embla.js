@@ -297,20 +297,22 @@ class TweenSplitText {
         const selectedIndex = this.emblaApi.selectedScrollSnap()
 
         slideNodes.forEach((slideEl, index) => {
-            const titleEl = slideEl.querySelector(this.titleSelector)
+            const titleEls = slideEl.querySelectorAll(this.titleSelector)
             
-            this.splitTextCache[index] = { title: [] }
+            this.splitTextCache[index] = { words: [] }
 
-            if (titleEl) {
-                const st = new SplitText(titleEl, {
-                    type: "words lines",
-                    wordsClass: "bp-word",
-                    linesClass: "bp-line",
+            if (titleEls.length > 0) {
+                titleEls.forEach(titleEl => {
+                    const st = new SplitText(titleEl, {
+                        type: "words lines",
+                        wordsClass: "bp-word",
+                        linesClass: "bp-line",
+                    })
+                    this.splitTextCache[index].words.push(...st.words)
                 })
-                this.splitTextCache[index].title = st.words
             }
             if (index !== selectedIndex) {
-                const words = [...(this.splitTextCache[index].title || [])]
+                const words = this.splitTextCache[index].words
                 if (words.length) gsap.set(words, { yPercent: 100 })
             }
         })
@@ -328,7 +330,7 @@ class TweenSplitText {
         const prevY = scrollDown ? -100 : 100
 
         if (this.splitTextCache[currentIndex]) {
-            const words = [...(this.splitTextCache[currentIndex].title || [])]
+            const words = this.splitTextCache[currentIndex].words
             
             if (words.length) {
                 gsap.set(words, { yPercent: scrollDown ? 100 : -100 })
@@ -341,7 +343,7 @@ class TweenSplitText {
         }
 
         if (prevIdx >= 0 && this.splitTextCache[prevIdx]) {
-            const prevWords = [...(this.splitTextCache[prevIdx].title || [])]
+            const prevWords = this.splitTextCache[prevIdx].words
 
             if (prevWords.length) {
                 gsap.to(prevWords, {

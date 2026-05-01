@@ -1167,8 +1167,8 @@ const script = () => {
             EmblaCarouselFade()
           ]);
 
-          this.tweenSplitText = new TweenSplitText(this.emblaApi, {
-            titleSelector: '.home-testi-slide-text-item .txt'
+          this.tweenSplitTextName = new TweenSplitText(this.emblaApiName, {
+            titleSelector: '.home-testi-name-text .lable, .home-testi-name-pos .lable'
           });
 
           const syncMainToName = () => {
