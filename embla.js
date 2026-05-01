@@ -283,3 +283,100 @@ class DotButtons {
     }
 }
 
+class TweenSplitText {
+    constructor(emblaApi, options = {}) {
+        this.emblaApi = emblaApi
+        this.splitTextCache = []
+        this.lastIndex = -1
+        this.titleSelector = options.titleSelector || '.embla__slide__title'
+        this.init()
+    }
+
+    setupTextCache() {
+        const slideNodes = this.emblaApi.slideNodes()
+        const selectedIndex = this.emblaApi.selectedScrollSnap()
+
+        slideNodes.forEach((slideEl, index) => {
+            const titleEl = slideEl.querySelector(this.titleSelector)
+            
+            this.splitTextCache[index] = { title: [] }
+
+            if (titleEl) {
+                // Assuming SplitText is available globally
+                const st = new SplitText(titleEl, {
+                    type: "words lines",
+                    wordsClass: "bp-word",
+                    linesClass: "bp-line",
+                })
+                this.splitTextCache[index].title = st.words
+            }
+
+            // Hide inactive slide texts initially
+            if (index !== selectedIndex) {
+                const words = [...(this.splitTextCache[index].title || [])]
+                if (words.length) gsap.set(words, { yPercent: 100, opacity: 0 })
+            }
+        })
+        
+        this.lastIndex = selectedIndex
+    }
+
+    animateText() {
+        const currentIndex = this.emblaApi.selectedScrollSnap()
+        if (currentIndex === this.lastIndex) return
+
+        const prevIdx = this.lastIndex
+        
+        // Optional: Support loop plugin by comparing with shortest distance if needed.
+        // For simplicity, just compare indices for direction.
+        const scrollDown = currentIndex > prevIdx
+        const prevY = scrollDown ? -100 : 100
+        
+        // Reset current text position before animating in
+        if (this.splitTextCache[currentIndex]) {
+            const words = [...(this.splitTextCache[currentIndex].title || [])]
+            
+            if (words.length) {
+                gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
+                gsap.to(words, {
+                    yPercent: 0,
+                    opacity: 1,
+                    duration: 0.4,
+                    stagger: 0.02,
+                })
+            }
+        }
+
+        // Animate previous text out
+        if (prevIdx >= 0 && this.splitTextCache[prevIdx]) {
+            const prevWords = [...(this.splitTextCache[prevIdx].title || [])]
+
+            if (prevWords.length) {
+                gsap.to(prevWords, {
+                    yPercent: prevY,
+                    opacity: 0,
+                    duration: 0.4,
+                    stagger: 0.02,
+                })
+            }
+        }
+
+        this.lastIndex = currentIndex
+    }
+
+    init() {
+        this.setupTextCache()
+
+        this.emblaApi
+            .on('reInit', () => {
+                this.splitTextCache = []
+                this.setupTextCache()
+            })
+            .on('select', () => this.animateText())
+    }
+
+    destroy() {
+        // Optional: you can revert the SplitText here if needed
+        this.splitTextCache = []
+    }
+}
