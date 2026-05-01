@@ -337,7 +337,7 @@ class TweenSplitText {
             const words = [...(this.splitTextCache[currentIndex].title || [])]
             
             if (words.length) {
-                gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
+                gsap.set(words, { yPercent: scrollDown ? 100 : -100 })
                 gsap.to(words, {
                     yPercent: 0,
                     // opacity: 1,
