@@ -1149,11 +1149,12 @@ const script = () => {
         const pagiNumber = $(this).find('[data-pagi="number"]');
         const pagiTotal = $(this).find('[data-total="number"]');
 
-        this.emblaApi = EmblaCarousel(slidesInner, {}, [
+        this.emblaApi = EmblaCarousel(slidesInner, {duration: 40}, [
           EmblaCarouselFade(),
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
         ]);
         this.tweenSplitText = new TweenSplitText(this.emblaApi, {
+          duration: 0.3,
           titleSelector: '.home-testi-slide-text-item .txt'
         });
 
@@ -1163,11 +1164,12 @@ const script = () => {
           $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
           $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
 
-          this.emblaApiName = EmblaCarousel(slidesName, {}, [
+          this.emblaApiName = EmblaCarousel(slidesName, {duration: 40}, [
             EmblaCarouselFade()
           ]);
 
           this.tweenSplitTextName = new TweenSplitText(this.emblaApiName, {
+            duration: 0.3,
             titleSelector: '.home-testi-name-text .label, .home-testi-name-pos .label'
           });
 
