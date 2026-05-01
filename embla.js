@@ -313,7 +313,7 @@ class TweenSplitText {
             }
             if (index !== selectedIndex) {
                 const words = this.splitTextCache[index].words
-                if (words.length) gsap.set(words, { yPercent: 100 })
+                if (words.length) gsap.set(words, { yPercent: 100, opacity:0 })
             }
         })
         
@@ -333,9 +333,10 @@ class TweenSplitText {
             const words = this.splitTextCache[currentIndex].words
             
             if (words.length) {
-                gsap.set(words, { yPercent: scrollDown ? 100 : -100 })
+                gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
                 gsap.to(words, {
                     yPercent: 0,
+                    opacity: 1,
                     duration: 0.4,
                     stagger: 0.02,
                 })
@@ -348,6 +349,7 @@ class TweenSplitText {
             if (prevWords.length) {
                 gsap.to(prevWords, {
                     yPercent: prevY,
+                    opacity: 0,
                     duration: 0.4,
                     stagger: 0.02,
                 })
