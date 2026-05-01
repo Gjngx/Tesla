@@ -314,7 +314,7 @@ class TweenSplitText {
             // Hide inactive slide texts initially
             if (index !== selectedIndex) {
                 const words = [...(this.splitTextCache[index].title || [])]
-                if (words.length) gsap.set(words, { yPercent: 100, opacity: 0 })
+                if (words.length) gsap.set(words, { yPercent: 100 })
             }
         })
         
