@@ -340,7 +340,7 @@ class TweenSplitText {
                 gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
                 gsap.to(words, {
                     yPercent: 0,
-                    opacity: 1,
+                    // opacity: 1,
                     duration: 0.4,
                     stagger: 0.02,
                 })
@@ -354,7 +354,7 @@ class TweenSplitText {
             if (prevWords.length) {
                 gsap.to(prevWords, {
                     yPercent: prevY,
-                    opacity: 0,
+                    // opacity: 0,
                     duration: 0.4,
                     stagger: 0.02,
                 })

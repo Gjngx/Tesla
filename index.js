@@ -1150,10 +1150,10 @@ const script = () => {
         const pagiTotal = $(this).find('[data-total="number"]');
 
         this.emblaApi = EmblaCarousel(slidesInner, {}, [
+          EmblaCarouselFade(),
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
         ]);
         this.tweenSplitText = new TweenSplitText(this.emblaApi, {
-          // Truyền vào class chứa đoạn text description bạn muốn animate
           titleSelector: '.home-testi-slide-text-item .txt'
         });
 
