@@ -289,6 +289,8 @@ class TweenSplitText {
         this.splitTextCache = []
         this.lastIndex = -1
         this.titleSelector = options.titleSelector || '.embla__slide__title'
+        this.duration = options.duration || 0.4
+        this.stagger = options.stagger !== undefined ? options.stagger : 0.02
         this.init()
     }
 
@@ -313,7 +315,7 @@ class TweenSplitText {
             }
             if (index !== selectedIndex) {
                 const words = this.splitTextCache[index].words
-                if (words.length) gsap.set(words, { yPercent: 100, opacity:0 })
+                if (words.length) gsap.set(words, { yPercent: 100, opacity: 0 })
             }
         })
         
@@ -333,12 +335,13 @@ class TweenSplitText {
             const words = this.splitTextCache[currentIndex].words
             
             if (words.length) {
+                gsap.killTweensOf(words)
                 gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
                 gsap.to(words, {
                     yPercent: 0,
                     opacity: 1,
-                    duration: 0.4,
-                    stagger: 0.02,
+                    duration: this.duration,
+                    stagger: this.stagger,
                 })
             }
         }
@@ -347,11 +350,12 @@ class TweenSplitText {
             const prevWords = this.splitTextCache[prevIdx].words
 
             if (prevWords.length) {
+                gsap.killTweensOf(prevWords)
                 gsap.to(prevWords, {
                     yPercent: prevY,
                     opacity: 0,
-                    duration: 0.4,
-                    stagger: 0.02,
+                    duration: this.duration,
+                    stagger: this.stagger,
                 })
             }
         }
