@@ -1167,6 +1167,10 @@ const script = () => {
             EmblaCarouselFade()
           ]);
 
+          this.tweenSplitText = new TweenSplitText(this.emblaApi, {
+            titleSelector: '.home-testi-slide-text-item .txt'
+          });
+
           const syncMainToName = () => {
             if (this.emblaApiName && this.emblaApi) {
               if (this.emblaApiName.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {

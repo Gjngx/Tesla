@@ -302,7 +302,6 @@ class TweenSplitText {
             this.splitTextCache[index] = { title: [] }
 
             if (titleEl) {
-                // Assuming SplitText is available globally
                 const st = new SplitText(titleEl, {
                     type: "words lines",
                     wordsClass: "bp-word",
@@ -310,8 +309,6 @@ class TweenSplitText {
                 })
                 this.splitTextCache[index].title = st.words
             }
-
-            // Hide inactive slide texts initially
             if (index !== selectedIndex) {
                 const words = [...(this.splitTextCache[index].title || [])]
                 if (words.length) gsap.set(words, { yPercent: 100 })
@@ -326,13 +323,10 @@ class TweenSplitText {
         if (currentIndex === this.lastIndex) return
 
         const prevIdx = this.lastIndex
-        
-        // Optional: Support loop plugin by comparing with shortest distance if needed.
-        // For simplicity, just compare indices for direction.
+
         const scrollDown = currentIndex > prevIdx
         const prevY = scrollDown ? -100 : 100
-        
-        // Reset current text position before animating in
+
         if (this.splitTextCache[currentIndex]) {
             const words = [...(this.splitTextCache[currentIndex].title || [])]
             
@@ -340,21 +334,18 @@ class TweenSplitText {
                 gsap.set(words, { yPercent: scrollDown ? 100 : -100 })
                 gsap.to(words, {
                     yPercent: 0,
-                    // opacity: 1,
                     duration: 0.4,
                     stagger: 0.02,
                 })
             }
         }
 
-        // Animate previous text out
         if (prevIdx >= 0 && this.splitTextCache[prevIdx]) {
             const prevWords = [...(this.splitTextCache[prevIdx].title || [])]
 
             if (prevWords.length) {
                 gsap.to(prevWords, {
                     yPercent: prevY,
-                    // opacity: 0,
                     duration: 0.4,
                     stagger: 0.02,
                 })
@@ -376,7 +367,6 @@ class TweenSplitText {
     }
 
     destroy() {
-        // Optional: you can revert the SplitText here if needed
         this.splitTextCache = []
     }
 }
