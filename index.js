@@ -974,6 +974,49 @@ const script = () => {
       }
       setup() {
         console.log('Home video setup');
+        let player;
+
+        // YouTube API ready
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player('ytplayer', {
+            events: {
+              onStateChange: onPlayerStateChange
+            }
+          });
+        }
+
+        const thumb = document.querySelector('.home-video-anim-thumb');
+
+        // Click thumb
+        thumb.addEventListener('click', function () {
+          if (thumb.classList.contains('is-play')) {
+            player.playVideo();
+            thumb.classList.remove('is-play');
+            thumb.classList.add('is-pause');
+          } else {
+            player.pauseVideo();
+            thumb.classList.remove('is-pause');
+            thumb.classList.add('is-play');
+          }
+        });
+
+        // Khi trạng thái video thay đổi
+        function onPlayerStateChange(event) {
+          if (event.data === YT.PlayerState.PAUSED) {
+            thumb.classList.add('is-play');
+            thumb.classList.remove('is-pause');
+          }
+
+          if (event.data === YT.PlayerState.ENDED) {
+            thumb.classList.add('is-play');
+            thumb.classList.remove('is-pause');
+          }
+
+          if (event.data === YT.PlayerState.PLAYING) {
+            thumb.classList.remove('is-play');
+            thumb.classList.add('is-pause');
+          }
+        }
       }
       animationReveal() {
         this.videoAnimation();
@@ -991,7 +1034,9 @@ const script = () => {
         });
         tl.to($(this).find('.home-video-anim'), {
           width: '100%',
-          height: 'calc(100vh - 6.4rem)',
+          height: '100vh',
+          paddingRight: '0',
+          paddingBottom: '0',
           ease: 'none'
         });
       }
@@ -1339,9 +1384,174 @@ const script = () => {
         super.destroy();
       }
     },
+  };
+  const AboutPage = {
+    'about-hero-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about hero setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'about-overview-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about overview setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'about-text-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about text setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'about-mil-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about mil setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'about-why-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about why setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+        this.cardAnimation();
+      }
+      cardAnimation() {
+        const allCards = $(this).find('.about-why-card');
+        const cards = $(this).find('.about-why-card:not(:first-child)');
+        const firstCard = allCards.first();
+
+        gsap.set(allCards, { transformOrigin: "top center" });
+
+        const firstCardTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-why-inner'),
+            start: 'top top+=40%',
+            end: 'top top',
+            scrub: true,
+          },
+        });
+
+        firstCardTl.to(firstCard, {
+          rotationZ: 0,
+          ease: 'none'
+        });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-why-inner'),
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
+
+        cards.each((i, el) => {
+          const targetCards = cards.slice(i);
+          const currentCard = $(el);
+          tl.to(targetCards, {
+            y: () => -(el.offsetTop - firstCard[0].offsetTop),
+            ease: 'none'
+          }, `step${i}`);
+
+          tl.to(currentCard, {
+            rotationZ: 0,
+            ease: 'none'
+          }, `step${i}`);
+        });
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
+    'about-area-wrap': class extends TriggerSetup {
+      constructor() {
+        super();
+        this.onTrigger = () => {
+          this.setup();
+          this.animationReveal();
+          this.interact();
+        }
+      }
+      setup() {
+        console.log('about area setup');
+      }
+      animationReveal() {
+      }
+      interact() {
+      }
+      destroy() {
+        super.destroy();
+      }
+    },
   }
-
-
   class PageManager {
     constructor(page) {
       if (!page || typeof page !== 'object') {
@@ -1383,6 +1593,7 @@ const script = () => {
   const pageName = $('.main-inner').attr('data-barba-namespace');
   const pageConfig = {
     home: HomePage,
+    about: AboutPage
   };
   const registry = {};
   let footerInstance = null;
