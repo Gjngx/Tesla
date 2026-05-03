@@ -649,6 +649,7 @@ const script = () => {
       else {
         this.toggleDropdownDown();
       }
+      this.toggleMode();
     }
     updateOnScroll(inst) {
       this.toggleHide(inst);
@@ -674,19 +675,14 @@ const script = () => {
       if (inst.direction == 1) {
         if (inst.scroll > ($(this.el).height() * 3)) {
           $(this.el).addClass('on-hide');
-          // $('.home-intro').css('top', 0 + "px");
         }
       } else if (inst.direction == -1) {
         if (inst.scroll > ($(this.el).height() * 3)) {
-          // let heightHeader = $(this.el).outerHeight();
-          // $('.home-intro').css('top', heightHeader + "px");
           $(this.el).addClass("on-hide");
           $(this.el).removeClass("on-hide");
         }
       }
       else {
-        // let heightHeader = $(this.el).outerHeight();
-        // $('.home-intro').css('top', heightHeader + "px");
         $(this.el).removeClass("on-hide");
       }
     }
@@ -761,9 +757,9 @@ const script = () => {
 
       $allLinks.on('mouseleave', handleMouseLeave);
 
-      $allLinks.on('click', (e) => {
-        e.preventDefault();
-      });
+      // $allLinks.on('click', (e) => {
+      //   e.preventDefault();
+      // });
 
       const $dropdownDesktop = $(this.el).find('.header-menu-dropdown-desktop');
       $dropdownDesktop.on('mouseenter', handleMouseEnterDropdown);
@@ -1233,7 +1229,7 @@ const script = () => {
         const pagiNumber = $(this).find('[data-pagi="number"]');
         const pagiTotal = $(this).find('[data-total="number"]');
 
-        this.emblaApi = EmblaCarousel(slidesInner, {duration: 40}, [
+        this.emblaApi = EmblaCarousel(slidesInner, {duration: 50}, [
           EmblaCarouselFade(),
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
         ]);
@@ -1248,7 +1244,7 @@ const script = () => {
           $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
           $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
 
-          this.emblaApiName = EmblaCarousel(slidesName, {duration: 40}, [
+          this.emblaApiName = EmblaCarousel(slidesName, {duration: 50}, [
             EmblaCarouselFade()
           ]);
 
