@@ -1423,34 +1423,46 @@ const script = () => {
         this.heroAnimation();
       }
       heroAnimation() {
+        const textWrap = $(this).find('.about-hero-text-wrap');
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: $(this).find('.about-hero'),
             start: 'top top',
             end: 'bottom bottom',
             scrub: true,
+            onUpdate: (self) => {
+              if (self.progress > 0.4) {
+                textWrap.css('pointer-events', 'none');
+              } else {
+                textWrap.css('pointer-events', 'auto');
+              }
+            },
           },
         });
         tl.to($(this).find('.about-hero-text-wrap'), {
           yPercent: -100,
-          scale: 0.65,
+          scale: 0.7,
           autoAlpha: 0,
+          duration: 0.85,
           ease: 'power1.inOut',
         });
         tl.to($(this).find('.about-hero-main'), {
           paddingRight: 0,
           paddingLeft: 0,
+          duration: 1,
           ease: 'none',
-        }, '<');
+        }, 0);
         tl.to($(this).find('.about-hero-bottom'), {
           marginTop: '-100vh',
+          duration: 1,
           ease: 'none',
-        }, '<');
+        }, 0);
         tl.to($(this).find('.about-hero-thumb.thumb-anim'), {
           width: '100%',
           height: '100vh',
+          duration: 1,
           ease: 'none',
-        }, '<');
+        }, 0);
       }
       destroy() {
         super.destroy();
@@ -1511,6 +1523,94 @@ const script = () => {
       animationReveal() {
       }
       interact() {
+        this.animScrub();
+      }
+      animScrub(){
+        const inner = $(this).find('.about-mil-slide-inner');
+        const item = $(this).find('.about-mil-item');
+        const tags = $(this).find('.about-mil-timeline-tags-inner');
+        const tagItem = $(this).find('.about-mil-timeline-tag-item');
+        const timelineSvgInner = $(this).find('.about-mil-timeline-svgs-inner');
+        
+        const timelineSvgItem = timelineSvgInner.find('.about-mil-timeline-svg').first();
+        if (timelineSvgItem.length && tags.length) {
+          const targetWidth = tags[0].scrollWidth;
+          const itemWidth = timelineSvgItem.outerWidth(true);
+          if (itemWidth > 0) {
+            const clonesNeeded = Math.ceil(targetWidth / itemWidth) - timelineSvgInner.find('.about-mil-timeline-svg').length + 1;
+            for (let i = 0; i < clonesNeeded; i++) {
+              timelineSvgInner.append(timelineSvgItem.clone());
+            }
+          }
+        }
+
+        const svg = $(this).find('.about-mil-svg');
+        if(svg.length) {
+          gsap.set(svg, { width: inner[0].scrollWidth });
+        }
+
+        const path = $(this).find("#drawPath").get(0);
+        const length = path.getTotalLength();
+
+        gsap.set(path, {
+          strokeDasharray: length,
+          strokeDashoffset: length
+        });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-mil-progress'),
+            start: 'top bottom',
+            end: 'bottom bottom+=100%',
+            scrub: true,
+          },
+        });
+
+        tl.to(path, {
+          strokeDashoffset: 0,
+          duration: 1,
+          ease: 'none',
+        });
+
+        const winWidth = $(window).width();
+        const svgW = svg.width();
+
+        console.log('aa', inner.width() - item.width(), tags.width() - tagItem.width() );
+        
+        let startSlideTime = (winWidth / 2) / svgW;
+        
+        let slideDuration = (svgW - winWidth) / svgW;
+
+        if (svgW <= winWidth) {
+          startSlideTime = 0;
+          slideDuration = 1;
+        }
+
+        tl.to(svg, {
+          x: `-${svgW - winWidth}`,
+          duration: slideDuration,
+          ease: 'none',
+        }, startSlideTime);
+
+        tl.to(inner, {
+          x: `-${(inner.width()  - item.width())}`,
+          duration: slideDuration,
+          ease: 'none',
+        }, startSlideTime);
+
+        const tagsTranslateX = tags.width() - tagItem.width();
+
+        tl.to(tags, {
+          x: `-${tagsTranslateX}`,
+          duration: slideDuration,
+          ease: 'none',
+        }, startSlideTime);
+
+        tl.to(timelineSvgInner, {
+          x: `-${tagsTranslateX}`,
+          duration: slideDuration,
+          ease: 'none',
+        }, startSlideTime);
       }
       destroy() {
         super.destroy();
