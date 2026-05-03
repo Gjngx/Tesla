@@ -995,47 +995,67 @@ const script = () => {
         console.log('Home video setup');
         let player;
 
-        // YouTube API ready
-        function onYouTubeIframeAPIReady() {
+        const initPlayer = () => {
           player = new YT.Player('ytplayer', {
             events: {
               onStateChange: onPlayerStateChange
             }
           });
+        };
+
+        if (window.YT && window.YT.Player) {
+          initPlayer();
+        } else {
+          window.onYouTubeIframeAPIReady = initPlayer;
         }
 
-        const thumb = document.querySelector('.home-video-anim-thumb');
+        const thumb = $(this).find('.home-video-anim-thumb');
+        const youtubeEmbed = $(this).find('.youtube-embed');
 
-        // Click thumb
-        thumb.addEventListener('click', function () {
-          if (thumb.classList.contains('is-play')) {
+        thumb.on('click', function () {
+          if (thumb.hasClass('is-play')) {
+            console.log('play');
             player.playVideo();
-            thumb.classList.remove('is-play');
-            thumb.classList.add('is-pause');
+            thumb.removeClass('is-play');
+            thumb.addClass('is-pause');
           } else {
+            console.log('pause');
             player.pauseVideo();
-            thumb.classList.remove('is-pause');
-            thumb.classList.add('is-play');
+            thumb.removeClass('is-pause');
+            thumb.addClass('is-play');
           }
         });
 
-        // Khi trạng thái video thay đổi
+        let isPlaying = false;
+
         function onPlayerStateChange(event) {
           if (event.data === YT.PlayerState.PAUSED) {
-            thumb.classList.add('is-play');
-            thumb.classList.remove('is-pause');
+            isPlaying = false;
+            thumb.addClass('is-play');
+            thumb.removeClass('is-pause');
+            youtubeEmbed.removeAttr('data-cursor');
           }
 
           if (event.data === YT.PlayerState.ENDED) {
-            thumb.classList.add('is-play');
-            thumb.classList.remove('is-pause');
+            isPlaying = false;
+            thumb.addClass('is-play');
+            thumb.removeClass('is-pause');
+            youtubeEmbed.removeAttr('data-cursor');
           }
 
           if (event.data === YT.PlayerState.PLAYING) {
-            thumb.classList.remove('is-play');
-            thumb.classList.add('is-pause');
+            isPlaying = true;
+            thumb.removeClass('is-play');
+            thumb.addClass('is-pause');
+            youtubeEmbed.attr('data-cursor', 'hidden');
           }
         }
+
+        window.addEventListener('scroll', () => {
+          if (isPlaying && player && typeof player.pauseVideo === 'function') {
+            player.pauseVideo();
+          }
+        }, { passive: true });
       }
       animationReveal() {
         this.videoAnimation();
@@ -1094,7 +1114,7 @@ const script = () => {
             scrub: true,
             onUpdate: (self) => {
               if (totalItems > 0) {
-                // Tính toán index dựa trên phần trăm scroll (0 -> 1)
+                
                 let index = Math.round(self.progress * (totalItems - 1));
 
                 if (index !== this.currentIndex) {
