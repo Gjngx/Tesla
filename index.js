@@ -712,8 +712,10 @@ const script = () => {
     }
     toggleDropdownDown() {
       const $allLinks = $(this.el).find('.header-menu-link.has-dropdown');
+      let closeTimeout;
 
       $allLinks.on('mouseenter', (e) => {
+        clearTimeout(closeTimeout);
         const $this = $(e.currentTarget);
         const $menu = $this.closest('.header-menu');
         const $links = $menu.find('.header-menu-link.has-dropdown');
@@ -747,13 +749,30 @@ const script = () => {
         }
       };
 
+      const handleMouseLeave = () => {
+        closeTimeout = setTimeout(() => {
+          closeDropdown();
+        }, 200);
+      };
+
+      const handleMouseEnterDropdown = () => {
+        clearTimeout(closeTimeout);
+      };
+
+      $allLinks.on('mouseleave', handleMouseLeave);
+
       $allLinks.on('click', (e) => {
         e.preventDefault();
       });
 
-      $(this.el).find('.header-menu-link:not(.has-dropdown)').on('mouseenter', closeDropdown);
-      $(this.el).find('.header-menu-dropdown-desktop').on('mouseleave', closeDropdown);
-      $(this.el).on('mouseleave', closeDropdown);
+      const $dropdownDesktop = $(this.el).find('.header-menu-dropdown-desktop');
+      $dropdownDesktop.on('mouseenter', handleMouseEnterDropdown);
+      $dropdownDesktop.on('mouseleave', handleMouseLeave);
+
+      $(this.el).find('.header-menu-link:not(.has-dropdown)').on('mouseenter', () => {
+        clearTimeout(closeTimeout);
+        closeDropdown();
+      });
 
       $(document).on('click', (e) => {
         const $target = $(e.target);
@@ -1401,6 +1420,37 @@ const script = () => {
       animationReveal() {
       }
       interact() {
+        this.heroAnimation();
+      }
+      heroAnimation() {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-hero'),
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
+        tl.to($(this).find('.about-hero-text-wrap'), {
+          yPercent: -100,
+          scale: 0.65,
+          autoAlpha: 0,
+          ease: 'power1.inOut',
+        });
+        tl.to($(this).find('.about-hero-main'), {
+          paddingRight: 0,
+          paddingLeft: 0,
+          ease: 'none',
+        }, '<');
+        tl.to($(this).find('.about-hero-bottom'), {
+          marginTop: '-100vh',
+          ease: 'none',
+        }, '<');
+        tl.to($(this).find('.about-hero-thumb.thumb-anim'), {
+          width: '100%',
+          height: '100vh',
+          ease: 'none',
+        }, '<');
       }
       destroy() {
         super.destroy();
@@ -1501,7 +1551,7 @@ const script = () => {
 
         firstCardTl.to(firstCard, {
           rotationZ: 0,
-          ease: 'none'
+          ease: 'power1.inOut'
         });
 
         const tl = gsap.timeline({
