@@ -1613,12 +1613,12 @@ const script = () => {
         }, startSlideTime);
 
         tl.to(inner, {
-          x: `-${(inner.width()  - item.width())}`,
+          x: `-${(inner.width()  - ((item.width() / 2 - cvUnit(8, 'rem'))) * 3 - cvUnit(32, 'rem'))}`,
           duration: slideDuration,
           ease: 'none',
         }, startSlideTime);
 
-        const tagsTranslateX = tags.width() - tagItem.width();
+        const tagsTranslateX = tags.width() - ((tagItem.width() / 2 - cvUnit(8, 'rem'))) * 3 - cvUnit(32, 'rem');
 
         tl.to(tags, {
           x: `-${tagsTranslateX}`,
