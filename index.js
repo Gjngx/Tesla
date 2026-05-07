@@ -894,9 +894,9 @@ const script = () => {
         const textSplitting = SplitText.create('.home-intro-text .txt', { type: 'words,chars' });
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: '.home-intro-text',
+            trigger: '.home-intro',
             start: 'top top+=70%',
-            end: 'top top-=30%',
+            end: 'bottom bottom+=35%',
             scrub: true,
           },
         })
@@ -920,6 +920,16 @@ const script = () => {
       }
       animationReveal() {
         this.cardAnimation();
+        const tlOverlap = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.home-cur'),
+            start: 'top center+=10%',
+            end: 'top top',
+            scrub: true,
+          },
+        });
+        tlOverlap.to('.home-intro-text-wrap', { scale: .98, autoAlpha: 0, duration: 1, ease: 'none' }, "<=0");
+        tlOverlap.to('.home-intro-text-wrap', { y: 20, duration: 0.8, ease: 'none' }, "<=0.2");
       }
       interact() {
       }
@@ -1229,14 +1239,10 @@ const script = () => {
         const pagiNumber = $(this).find('[data-pagi="number"]');
         const pagiTotal = $(this).find('[data-total="number"]');
 
-        this.emblaApi = EmblaCarousel(slidesInner, {duration: 50}, [
+        this.emblaApi = EmblaCarousel(slidesInner, {}, [
           EmblaCarouselFade(),
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
         ]);
-        this.tweenSplitText = new TweenSplitText(this.emblaApi, {
-          duration: 0.3,
-          titleSelector: '.home-testi-slide-text-item .txt'
-        });
 
         const slidesName = $(this).find('.home-testi-name-slide').get(0);
         if (slidesName) {
@@ -1244,14 +1250,9 @@ const script = () => {
           $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
           $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
 
-          this.emblaApiName = EmblaCarousel(slidesName, {duration: 50}, [
+          this.emblaApiName = EmblaCarousel(slidesName, {}, [
             EmblaCarouselFade()
           ]);
-
-          this.tweenSplitTextName = new TweenSplitText(this.emblaApiName, {
-            duration: 0.3,
-            titleSelector: '.home-testi-name-text .label, .home-testi-name-pos .label'
-          });
 
           const syncMainToName = () => {
             if (this.emblaApiName && this.emblaApi) {
@@ -1303,44 +1304,44 @@ const script = () => {
         }
 
         // Setup Background Slider
-        const slidesBg = $(this).find('.home-testi-bg-slide').get(0);
-        if (slidesBg) {
-          const bgInner = $(slidesBg).find('.home-testi-bg-slide-inner');
-          const bgItem = $(slidesBg).find('.home-testi-bg-slide-item').first();
+        // const slidesBg = $(this).find('.home-testi-bg-slide').get(0);
+        // if (slidesBg) {
+        //   const bgInner = $(slidesBg).find('.home-testi-bg-slide-inner');
+        //   const bgItem = $(slidesBg).find('.home-testi-bg-slide-item').first();
 
-          if (bgInner.length && bgItem.length && this.emblaApi) {
-            const totalSlides = this.emblaApi.scrollSnapList().length;
-            const currentCount = bgInner.find('.home-testi-bg-slide-item').length;
-            for (let i = currentCount; i < totalSlides; i++) {
-              bgInner.append(bgItem.clone());
-            }
-          }
+        //   if (bgInner.length && bgItem.length && this.emblaApi) {
+        //     const totalSlides = this.emblaApi.scrollSnapList().length;
+        //     const currentCount = bgInner.find('.home-testi-bg-slide-item').length;
+        //     for (let i = currentCount; i < totalSlides; i++) {
+        //       bgInner.append(bgItem.clone());
+        //     }
+        //   }
 
-          $(slidesBg).addClass('embla__viewport');
-          $(slidesBg).find('.home-testi-bg-slide-inner').addClass('embla__container');
-          $(slidesBg).find('.home-testi-bg-slide-item').addClass('embla__slide');
+        //   $(slidesBg).addClass('embla__viewport');
+        //   $(slidesBg).find('.home-testi-bg-slide-inner').addClass('embla__container');
+        //   $(slidesBg).find('.home-testi-bg-slide-item').addClass('embla__slide');
 
-          this.emblaApiBg = EmblaCarousel(slidesBg);
+        //   this.emblaApiBg = EmblaCarousel(slidesBg);
 
-          const syncMainToBg = () => {
-            if (this.emblaApiBg && this.emblaApi) {
-              if (this.emblaApiBg.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
-                this.emblaApiBg.scrollTo(this.emblaApi.selectedScrollSnap());
-              }
-            }
-          };
+        //   const syncMainToBg = () => {
+        //     if (this.emblaApiBg && this.emblaApi) {
+        //       if (this.emblaApiBg.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
+        //         this.emblaApiBg.scrollTo(this.emblaApi.selectedScrollSnap());
+        //       }
+        //     }
+        //   };
 
-          const syncBgToMain = () => {
-            if (this.emblaApiBg && this.emblaApi) {
-              if (this.emblaApi.selectedScrollSnap() !== this.emblaApiBg.selectedScrollSnap()) {
-                this.emblaApi.scrollTo(this.emblaApiBg.selectedScrollSnap());
-              }
-            }
-          };
+        //   const syncBgToMain = () => {
+        //     if (this.emblaApiBg && this.emblaApi) {
+        //       if (this.emblaApi.selectedScrollSnap() !== this.emblaApiBg.selectedScrollSnap()) {
+        //         this.emblaApi.scrollTo(this.emblaApiBg.selectedScrollSnap());
+        //       }
+        //     }
+        //   };
 
-          this.emblaApi.on('select', syncMainToBg);
-          this.emblaApiBg.on('select', syncBgToMain);
-        }
+        //   this.emblaApi.on('select', syncMainToBg);
+        //   this.emblaApiBg.on('select', syncBgToMain);
+        // }
 
         if (prevBtn && nextBtn) {
           this.prevNextButtons = new PrevNextButtons(this.emblaApi, prevBtn, nextBtn);
@@ -1547,7 +1548,7 @@ const script = () => {
         const tags = $(this).find('.about-mil-timeline-tags-inner');
         const tagItem = $(this).find('.about-mil-timeline-tag-item');
         const timelineSvgInner = $(this).find('.about-mil-timeline-svgs-inner');
-        
+
         const timelineSvgItem = timelineSvgInner.find('.about-mil-timeline-svg').first();
         if (timelineSvgItem.length && tags.length) {
           const targetWidth = tags[0].scrollWidth;
@@ -1573,11 +1574,34 @@ const script = () => {
           strokeDashoffset: length
         });
 
+        const winWidth = $(window).width();
+        const svgW = svg.width();
+
+        let startSlideTime = (winWidth / 2) / svgW;
+        let slideDuration = (svgW - winWidth) / svgW;
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: $(this).find('.about-mil-progress'),
             start: 'top bottom',
-            end: 'bottom bottom+=100%',
+            end: 'bottom bottom',
+            scrub: true,
+            onUpdate: (self) => {
+              const p = self.progress;
+              console.log(p);
+              item.eq(0).find('.about-mil-card').toggleClass('active', p >= 0.30631);
+              item.eq(1).find('.about-mil-card').toggleClass('active', p >= 0.44261);
+              item.eq(2).find('.about-mil-card').toggleClass('active', p >= 0.57563);
+              item.eq(3).find('.about-mil-card').toggleClass('active', p >= 0.70826);
+            }
+          },
+        });
+
+        const tlItem = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-mil-progress'),
+            start: 'top top',
+            end: 'bottom bottom',
             scrub: true,
           },
         });
@@ -1586,21 +1610,7 @@ const script = () => {
           strokeDashoffset: 0,
           duration: 1,
           ease: 'none',
-        });
-
-        const winWidth = $(window).width();
-        const svgW = svg.width();
-
-        console.log('aa', inner.width() - item.width(), tags.width() - tagItem.width() );
-        
-        let startSlideTime = (winWidth / 2) / svgW;
-        
-        let slideDuration = (svgW - winWidth) / svgW;
-
-        if (svgW <= winWidth) {
-          startSlideTime = 0;
-          slideDuration = 1;
-        }
+        }, 0);
 
         tl.to(svg, {
           x: `-${svgW - winWidth}`,
@@ -1608,25 +1618,31 @@ const script = () => {
           ease: 'none',
         }, startSlideTime);
 
-        tl.to(inner, {
-          x: `-${(inner.width()  - ((item.width() / 2 - cvUnit(8, 'rem'))) * 3 - cvUnit(32, 'rem'))}`,
+
+        if (svgW <= winWidth) {
+          startSlideTime = 0;
+          slideDuration = 1;
+        }
+
+        const translateX = (inner.width() + winWidth);
+
+        tlItem.to(inner, {
+          x: - translateX,
           duration: slideDuration,
           ease: 'none',
-        }, startSlideTime);
+        }, 0);
 
-        const tagsTranslateX = tags.width() - ((tagItem.width() / 2 - cvUnit(8, 'rem'))) * 3 - cvUnit(32, 'rem');
-
-        tl.to(tags, {
-          x: `-${tagsTranslateX}`,
+        tlItem.to(tags, {
+          x: -translateX,
           duration: slideDuration,
           ease: 'none',
-        }, startSlideTime);
+        }, 0);
 
-        tl.to(timelineSvgInner, {
-          x: `-${tagsTranslateX}`,
+        tlItem.to(timelineSvgInner, {
+          x: -translateX,
           duration: slideDuration,
           ease: 'none',
-        }, startSlideTime);
+        }, 0);
       }
       destroy() {
         super.destroy();
