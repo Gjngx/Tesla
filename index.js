@@ -887,6 +887,17 @@ const script = () => {
       }
       animationReveal() {
         this.SplitText();
+        new MasterTimeline({
+            scrollTrigger: {
+              trigger: '.home-intro-btn'
+            },
+            allowMobile: true,
+            tweenArr: [
+              // new FadeSplitText({ el: $('.home-intro-text .txt').get(0) }),
+              new FadeIn({ el: $('.home-intro-btn').get(0), from: { y: cvUnit(10, 'rem') }, delay: 0.2 }),
+              new FadeIn({ el: $('.home-intro-link').get(0), delay: 0.2})
+            ]
+        });
       }
       interact() {
       }
@@ -919,6 +930,18 @@ const script = () => {
         console.log('Home cur setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-cur-tag'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-cur-tag').get(0), from: { y: cvUnit(10, 'rem') } }),
+            new FadeSplitText ({ el: $('.home-cur-text .heading').get(0), delay: 0.2 }),
+            new FadeIn({ el: $('.home-cur-card').get(0), from: { y: cvUnit(10, 'rem') }, delay: 0.2 }),
+            new FadeIn({ el: $('.home-cur-card').get(1), from: { y: cvUnit(10, 'rem') }, delay: 0.4 }),
+          ]
+        });
         this.cardAnimation();
         const tlOverlap = gsap.timeline({
           scrollTrigger: {
@@ -1162,19 +1185,31 @@ const script = () => {
         this.slideAnimation();
       }
       slideAnimation() {
+        const bgItems = $(this).find('.home-blog-bg-slide-item');
+        const totalItems = bgItems.length;
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: $(this).find('.home-blog-progress'),
             start: 'top bottom',
             end: 'bottom bottom',
             scrub: true,
+            onUpdate: (self) => {
+              if (totalItems > 0) {
+                let index = Math.round(self.progress * (totalItems - 1));
+
+                if (index !== this.currentIndex) {
+                bgItems.removeClass('active');
+                  bgItems.eq(index).addClass('active');
+                  this.currentIndex = index;
+                }
+              }
+            }
           },
         });
 
         const fgInner = $(this).find('.home-blog-slide-inner');
         const fgWrapper = $(this).find('.home-blog-slide');
-
-        const bgItems = $(this).find('.home-blog-bg-slide-item');
 
         if (fgInner.length && fgWrapper.length) {
           tl.to(fgInner, {
@@ -1184,18 +1219,18 @@ const script = () => {
           }, 0);
         }
 
-        if (bgItems.length > 1) {
-          gsap.set(bgItems.slice(1), { clipPath: 'inset(0% 0% 0% 100%)' });
+        // if (bgItems.length > 1) {
+        //   gsap.set(bgItems.slice(1), { clipPath: 'inset(0% 0% 0% 100%)' });
 
-          const step = 1 / (bgItems.length - 1);
-          bgItems.slice(1).each((index, item) => {
-            tl.to(item, {
-              clipPath: 'inset(0% 0% 0% 0%)',
-              ease: 'power3.inOut',
-              duration: step
-            }, index * step);
-          });
-        }
+        //   const step = 1 / (bgItems.length - 1);
+        //   bgItems.slice(1).each((index, item) => {
+        //     tl.to(item, {
+        //       clipPath: 'inset(0% 0% 0% 0%)',
+        //       ease: 'power3.inOut',
+        //       duration: step
+        //     }, index * step);
+        //   });
+        // }
 
         $(this).find('.home-blog-btn-skip').on('click', (e) => {
           e.preventDefault();
