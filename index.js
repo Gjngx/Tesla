@@ -1661,6 +1661,16 @@ const script = () => {
         console.log('about why setup');
       }
       animationReveal() {
+        const tlOverlap = gsap.timeline({
+          scrollTrigger: {
+            trigger: $(this).find('.about-why'),
+            start: 'top bottom',
+            end: 'top top',
+            scrub: true,
+          },
+        });
+        tlOverlap.to('.about-mil', { scale: .98, autoAlpha: 0, duration: 1, ease: 'none' }, "<=0");
+        tlOverlap.to('.about-mil', { y: 20, duration: 0.8, ease: 'none' }, "<=0.2");
       }
       interact() {
         this.cardAnimation();
