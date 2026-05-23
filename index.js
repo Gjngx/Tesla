@@ -893,7 +893,7 @@ const script = () => {
             },
             allowMobile: true,
             tweenArr: [
-              // new FadeSplitText({ el: $('.home-intro-text .txt').get(0) }),
+              new FadeSplitText({ el: $('.home-intro-text .txt').get(0), isDisableRevert: true, duration: 0.4 }),
               new FadeIn({ el: $('.home-intro-btn').get(0), from: { y: cvUnit(10, 'rem') }, delay: 0.2 }),
               new FadeIn({ el: $('.home-intro-link').get(0), delay: 0.2})
             ]
@@ -938,8 +938,6 @@ const script = () => {
           tweenArr: [
             new FadeIn({ el: $('.home-cur-tag').get(0), from: { y: cvUnit(10, 'rem') } }),
             new FadeSplitText ({ el: $('.home-cur-text .heading').get(0), delay: 0.2 }),
-            new FadeIn({ el: $('.home-cur-card').get(0), from: { y: cvUnit(10, 'rem') }, delay: 0.2 }),
-            new FadeIn({ el: $('.home-cur-card').get(1), from: { y: cvUnit(10, 'rem') }, delay: 0.4 }),
           ]
         });
         this.cardAnimation();

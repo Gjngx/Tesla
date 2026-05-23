@@ -227,7 +227,7 @@ class RevealTextReset  {
     }
 }
 class FadeSplitText {
-    constructor({ el, delay, splitType, isDisableRevert, ...props }) {
+    constructor({ el, delay, duration = 0.8, splitType, isDisableRevert, ...props }) {
         if (!el || el.textContent === '') return;
         this.DOM = { el: el };
         this.delay = delay;
@@ -245,7 +245,7 @@ class FadeSplitText {
                         autoAlpha: 1,
                         yPercent: 0,
                         stagger: this.splitType === 'words' ? 0.02 : 0.1,
-                        duration: .8,
+                        duration: duration,
                         willChange: 'transform, opacity',
                         ease: 'power2.out',
                         clearProps: 'overflow',
@@ -266,7 +266,7 @@ class FadeSplitText {
                                 if (this.DOM.el.querySelectorAll('.heading-decor').length !== 0) {
                                     this.DOM.el.querySelectorAll('.heading-decor').forEach(element => element.classList.add('active'));
                                 }
-                            }, 450);
+                            }, duration * 1000 * 0.5625);
                         },
                         ...props
                     });
