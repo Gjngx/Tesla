@@ -893,7 +893,7 @@ const script = () => {
             },
             allowMobile: true,
             tweenArr: [
-              new FadeSplitText({ el: $('.home-intro-text .txt').get(0), isDisableRevert: true, duration: 0.4 }),
+              new FadeSplitText({ el: $('.home-intro-text .txt').get(0), splitType: 'lines', isDisableRevert: true}),
               new FadeIn({ el: $('.home-intro-btn').get(0), from: { y: cvUnit(10, 'rem') }, delay: 0.2 }),
               new FadeIn({ el: $('.home-intro-link').get(0), delay: 0.2})
             ]
@@ -932,21 +932,27 @@ const script = () => {
       animationReveal() {
         new MasterTimeline({
           scrollTrigger: {
-            trigger: '.home-cur-tag'
+            trigger: '.home-cur'
           },
           allowMobile: true,
           tweenArr: [
-            new FadeIn({ el: $('.home-cur-tag').get(0), from: { y: cvUnit(10, 'rem') } }),
-            new FadeSplitText ({ el: $('.home-cur-text .heading').get(0), delay: 0.2 }),
+            new FadeIn({ el: $('.home-cur-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeSplitText ({ el: $('.home-cur-text .heading').get(0),splitType: 'lines', delay: 0.2 }),
           ]
         });
+
         this.cardAnimation();
+
         const tlOverlap = gsap.timeline({
           scrollTrigger: {
             trigger: $(this).find('.home-cur'),
             start: 'top center+=10%',
             end: 'top top',
             scrub: true,
+            once: true,
+            onComplete: () => {
+              this.cardAnimation();
+            }
           },
         });
         tlOverlap.to('.home-intro-text-wrap', { scale: .98, autoAlpha: 0, duration: 1, ease: 'none' }, "<=0");
@@ -954,11 +960,101 @@ const script = () => {
       }
       interact() {
       }
+      initCardContent() {
+        $(this).find('.home-cur-card').each((i, card) => {
+          const $card = $(card);
+          const numberEl = $card.find('.home-cur-card-number .label').get(0);
+          const imgEl    = $card.find('.home-cur-card-img-inner').get(0);
+          const titleEl  = $card.find('.home-cur-card-title .heading').get(0);
+          const desEl    = $card.find('.home-cur-card-des .txt').get(0);
+
+          const splits = {};
+          // Hide .home-cur-card-inner (not the wrapper, to avoid conflict with stack anim)
+          const cardInner = $card.find('.home-cur-card-inner').get(0);
+          splits.cardInner = cardInner;
+          if (cardInner) gsap.set(cardInner, { autoAlpha: 0, y: cvUnit(10, 'rem') });
+          if (numberEl) {
+            splits.number = SplitText.create(numberEl, { type: 'lines words', mask: 'lines' });
+            gsap.set(splits.number.words, { autoAlpha: 0, yPercent: 100 });
+          }
+          if (imgEl) {
+            const borderRad = gsap.getProperty(imgEl, 'border-radius');
+            splits.borderRad = borderRad;
+            gsap.set(imgEl, { clipPath: `inset(20% round ${borderRad}px)`, scale: 1.4, autoAlpha: 0 });
+          }
+          if (titleEl) {
+            splits.title = SplitText.create(titleEl, { type: 'lines words', mask: 'lines' });
+            gsap.set(splits.title.words, { autoAlpha: 0, yPercent: 100 });
+          }
+          if (desEl) {
+            splits.des = SplitText.create(desEl, { type: 'lines words', mask: 'lines' });
+            gsap.set(splits.des.words, { autoAlpha: 0, yPercent: 100 });
+          }
+          // Store splits on the card element for reuse in animateCardContent
+          $(card).data('cardSplits', splits);
+        });
+      }
+      animateCardContent(card) {
+        const $card = $(card);
+        const tl = gsap.timeline();
+        const imgEl    = $card.find('.home-cur-card-img-inner').get(0);
+        const splits   = $card.data('cardSplits') || {};
+
+        // Fade in .home-cur-card-inner (not card wrapper, controlled by stack anim)
+        if (splits.cardInner) {
+          tl.to(splits.cardInner, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out', clearProps: 'all' }, 0);
+        }
+
+        if (splits.number) {
+          tl.to(splits.number.words, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.02, ease: 'power2.out' }, 0);
+        }
+        if (imgEl) {
+          const borderRad = splits.borderRad || 0;
+          tl.to(imgEl, { clipPath: `inset(0% round ${borderRad}px)`, scale: 1, autoAlpha: 1, duration: 2, ease: 'expo.out' }, 0);
+        }
+        if (splits.title) {
+          tl.to(splits.title.words, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.02, ease: 'power2.out' }, 0.1);
+        }
+        if (splits.des) {
+          tl.to(splits.des.words, { autoAlpha: 1, yPercent: 0, duration: 0.8, stagger: 0.02, ease: 'power2.out' }, 0.2);
+        }
+      }
       cardAnimation() {
         const allCards = $(this).find('.home-cur-card');
         const cards = $(this).find('.home-cur-card:not(:first-child)');
+        const numCards = allCards.length;
+        const triggered = Array(numCards).fill(false);
 
         gsap.set(allCards, { transformOrigin: "top center" });
+
+        // Pre-hide all card content before any animation
+        this.initCardContent();
+
+        // Fire card 0 content when section enters viewport (before stack starts)
+        ScrollTrigger.create({
+          trigger: $(this).find('.home-cur-anim'),
+          start: 'top top+=70%',
+          once: true,
+          onEnter: () => {
+            if (!triggered[0]) {
+              triggered[0] = true;
+              this.animateCardContent(allCards.get(0));
+            }
+          }
+        });
+
+        // Fire card 1 (card 2) when it enters the viewport
+        ScrollTrigger.create({
+          trigger: allCards.get(1),
+          start: 'top top+=70%',
+          once: true,
+          onEnter: () => {
+            if (!triggered[1]) {
+              triggered[1] = true;
+              this.animateCardContent(allCards.get(1));
+            }
+          }
+        });
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -966,6 +1062,18 @@ const script = () => {
             start: 'top top',
             end: 'bottom bottom',
             scrub: true,
+            onUpdate: (self) => {
+              const progress = self.progress;
+              allCards.each((i, card) => {
+                if (i === 0) return;
+                // Fire slightly before previous card (i-1) starts stacking
+                const threshold = Math.max(0, (i - 1) / (numCards - 1) - 0.1);
+                if (progress >= threshold && !triggered[i]) {
+                  triggered[i] = true;
+                  this.animateCardContent(card);
+                }
+              });
+            }
           },
         });
 
@@ -1002,6 +1110,32 @@ const script = () => {
         console.log('Home ib setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-ib-text-wrap'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new ScaleInset({ el: $('.home-ib-thumb-inner').get(0)}),
+            new ScaleInset({ el: $('.home-ib-decor img').get(0), delay: 0.6}),
+            new FadeIn({ el: $('.home-ib-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeSplitText({ el: $('.home-ib-text .txt').get(0), splitType: 'lines'}),
+          ]
+        });
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-ib-block'
+          },
+          allowMobile: true,
+          tweenArr: [
+            ...Array.from($('.home-ib-card')).flatMap((el, idx) => [
+              new FadeIn({ el: $(el).find('.home-ib-card-img').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.home-ib-card-title .txt').get(0), delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.home-ib-card-des .txt').get(0), delay: idx * 0.25 + 0.2 }),
+            ]),
+            new FadeIn({ el: $('.home-ib-action').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.3 }),
+          ]
+        });
       }
       interact() {
       }
@@ -1085,6 +1219,15 @@ const script = () => {
         }, { passive: true });
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-video-anim'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-video-anim-inner').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+          ]
+        });
         this.videoAnimation();
       }
       interact() {
@@ -1123,6 +1266,24 @@ const script = () => {
         console.log('Home learn setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-learn-tag'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-learn-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new ScaleInset({ el: $('.home-learn-item').get(0) }), 
+            new FadeSplitText({ el: $('.home-learn-text .heading').get(0), delay: 0.2 }),
+
+            ...Array.from($('.home-learn-content-item')).flatMap((el, idx) => [
+              new FadeIn({ el: $(el).find('.home-learn-item-ic').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.home-learn-item-title .txt').get(0), delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.home-learn-item-text .txt').get(0), delay: idx * 0.25 + 0.2 }),
+            ]),
+            new FadeIn({ el: $('.home-learn-action').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.8 }),
+          ]
+        });
         this.learnAnimation();
       }
       interact() {
@@ -1178,6 +1339,22 @@ const script = () => {
         console.log('Home blog setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-blog-tag'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-blog-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeSplitText({ el: $('.home-blog-title .heading').get(0), delay: 0.2 }),
+            new FadeIn({ el: $('.home-blog-links').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.3 }),
+            new FadeIn({ el: $('.home-blog-slide-card').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.4 }),
+            new ScaleInset({ el: $('.home-blog-slide-card-img').get(0), delay: 0.6 }), 
+            new FadeSplitText({ el: $('.home-blog-slide-card-title .txt').get(0), delay: 0.6 }),
+            new FadeSplitText({ el: $('.home-blog-slide-card-des .txt').get(0), delay: 0.6 }),
+            new FadeIn({ el: $('.home-blog-btn').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.8 }),
+          ]
+        });
       }
       interact() {
         this.slideAnimation();
@@ -1254,6 +1431,23 @@ const script = () => {
         console.log('Home testi setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-testi-tag'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-testi-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeIn({ el: $('.home-testi-ic-inner').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }}),
+            new FadeSplitText({ el: $('.home-testi-slide-text-item .txt').get(0), splitType: 'lines'}),
+            new ScaleInset({ el: $('.home-testi-avatar-slide-img').get(0)}),
+            new ScaleInset({ el: $('.home-testi-avatar-slide-img').get(1) }),
+            new FadeIn({ el: $('.home-testi-pagi').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.4 }),
+            new FadeSplitText({ el: $('.home-testi-name-text .label').get(0), delay: 0.4 }),
+            new FadeSplitText({ el: $('.home-testi-name-pos .label').get(0), delay: 0.4 }),
+            new FadeIn({ el: $('.home-testi-ctrls').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.4 }),
+          ]
+        });
       }
       interact() {
         this.initSlideAnimation();
@@ -1417,6 +1611,15 @@ const script = () => {
         new Marquee($(this).find('.home-marquee-list'), 120).setup();
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-marquee'
+          },
+          allowMobile: true,
+          tweenArr: [
+            ...Array.from($('.home-marquee-item-anim')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } })),
+          ]
+        });
       }
       interact() {
       }
@@ -1437,6 +1640,23 @@ const script = () => {
         console.log('Home faq setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.home-faq-tag'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.home-faq-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeSplitText({ el: $('.home-faq-head-title .heading').get(0), splitType: 'lines' }),
+            new FadeIn({ el: $('.home-faq-head-review-user').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.2 }),
+            new FadeIn({ el: $('.home-faq-head-review-star').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.2 }),
+            new FadeSplitText({ el: $('.home-faq-head-review-des .txt').get(0), delay: 0.4 }),
+            ...Array.from($('.home-faq-item')).flatMap((el, idx) => [
+              new FadeIn({ el: $(el).find('.home-faq-item').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.home-faq-item-main-title .txt').get(0), delay: idx * 0.25 }),
+            ]),
+          ]
+        });
       }
       interact() {
         $(this).find('.home-faq-item-main-title').on('click', (e) => {
