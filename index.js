@@ -826,7 +826,29 @@ const script = () => {
       console.log('Footer setup');
     }
     animationReveal() {
-
+      new MasterTimeline({
+        scrollTrigger: {
+          trigger: '.footer-top'
+        },
+        allowMobile: true,
+        tweenArr: [
+          new FadeIn({ el: $('.footer-top-img').get(0) }),
+          ...Array.from($('.footer-menu-label .label')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0)})),
+          ...Array.from($('.footer-top-link')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) })),
+          ...Array.from($('.footer-menu-link-inner .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) })),
+        ],
+        stagger: 0.05
+      });
+      new MasterTimeline({
+        scrollTrigger: {
+          trigger: '.footer-botom'
+        },
+        allowMobile: true,
+        tweenArr: [
+          ...Array.from($('.footer-botom-item')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) })),
+        ],
+        stagger: 0.05
+      });
     }
     destroy() {
       super.destroy();
@@ -848,6 +870,18 @@ const script = () => {
         console.log('Home hero setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          timeline: gsap.timeline({
+            onStart: () => {
+              $('[data-init-hidden]').removeAttr('data-init-hidden');
+            }
+          }),
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $(this).find('.home-hero-scrolldown').get(0) }),
+            ...Array.from($('.home-hero-slide-ctrl-btn')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } })),
+          ]
+        });
       }
       interact() {
         this.initSlider();
