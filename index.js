@@ -845,9 +845,8 @@ const script = () => {
         },
         allowMobile: true,
         tweenArr: [
-          ...Array.from($('.footer-botom-item')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) })),
+          ...Array.from($('.footer-botom-item')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0), delay: 0.2 * (idx + 1) })),
         ],
-        stagger: 0.05
       });
     }
     destroy() {
