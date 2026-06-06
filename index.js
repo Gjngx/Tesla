@@ -949,7 +949,6 @@ const script = () => {
             start: 'top center+=10%',
             end: 'top top',
             scrub: true,
-            once: true,
             onComplete: () => {
               this.cardAnimation();
             }
@@ -1117,7 +1116,7 @@ const script = () => {
           allowMobile: true,
           tweenArr: [
             new ScaleInset({ el: $('.home-ib-thumb-inner').get(0)}),
-            new ScaleInset({ el: $('.home-ib-decor img').get(0), delay: 0.6}),
+            new FadeIn({ el: $('.home-ib-decor img').get(0), delay: 0.6}),
             new FadeIn({ el: $('.home-ib-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
             new FadeSplitText({ el: $('.home-ib-text .txt').get(0), splitType: 'lines'}),
           ]
@@ -1273,7 +1272,7 @@ const script = () => {
           allowMobile: true,
           tweenArr: [
             new FadeIn({ el: $('.home-learn-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
-            new ScaleInset({ el: $('.home-learn-item').get(0) }), 
+            new ScaleInset({ el: $('.home-learn-slide').get(0) }), 
             new FadeSplitText({ el: $('.home-learn-text .heading').get(0), delay: 0.2 }),
 
             ...Array.from($('.home-learn-content-item')).flatMap((el, idx) => [
@@ -1373,11 +1372,21 @@ const script = () => {
               if (totalItems > 0) {
                 let index = Math.round(self.progress * (totalItems - 1));
 
-                if (index !== this.currentIndex) {
-                bgItems.removeClass('active');
-                  bgItems.eq(index).addClass('active');
-                  this.currentIndex = index;
-                }
+                // if (index !== this.currentIndex) {
+                // bgItems.removeClass('active');
+                //   bgItems.eq(index).addClass('active');
+                //   this.currentIndex = index;
+                // }
+
+                bgItems.each((i, bgItem) => {
+                  if (i === 0) return;
+
+                  if (i <= index) {
+                    gsap.to(bgItem, { opacity: 1, duration: 0.2, ease: 'none', overwrite: 'auto' });
+                  } else {
+                    gsap.to(bgItem, { opacity: 0, duration: 0.4, ease: 'none', overwrite: 'auto' });
+                  }
+                });
               }
             }
           },
@@ -1390,6 +1399,11 @@ const script = () => {
           tl.to(fgInner, {
             x: () => -(fgInner[0].scrollWidth - fgWrapper.width()),
             ease: 'power3.inOut',
+            duration: 1
+          }, 0);
+          tl.to(bgItems, {
+            scale: 1.1,
+            ease: 'none',
             duration: 1
           }, 0);
         }
@@ -1800,19 +1814,19 @@ const script = () => {
         const item = $(this).find('.about-mil-item');
         const tags = $(this).find('.about-mil-timeline-tags-inner');
         const tagItem = $(this).find('.about-mil-timeline-tag-item');
-        const timelineSvgInner = $(this).find('.about-mil-timeline-svgs-inner');
+        // const timelineSvgInner = $(this).find('.about-mil-timeline-svgs-inner');
 
-        const timelineSvgItem = timelineSvgInner.find('.about-mil-timeline-svg').first();
-        if (timelineSvgItem.length && tags.length) {
-          const targetWidth = tags[0].scrollWidth;
-          const itemWidth = timelineSvgItem.outerWidth(true);
-          if (itemWidth > 0) {
-            const clonesNeeded = Math.ceil(targetWidth / itemWidth) - timelineSvgInner.find('.about-mil-timeline-svg').length + 1;
-            for (let i = 0; i < clonesNeeded; i++) {
-              timelineSvgInner.append(timelineSvgItem.clone());
-            }
-          }
-        }
+        // const timelineSvgItem = timelineSvgInner.find('.about-mil-timeline-svg').first();
+        // if (timelineSvgItem.length && tags.length) {
+        //   const targetWidth = tags[0].scrollWidth;
+        //   const itemWidth = timelineSvgItem.outerWidth(true);
+        //   if (itemWidth > 0) {
+        //     const clonesNeeded = Math.ceil(targetWidth / itemWidth) - timelineSvgInner.find('.about-mil-timeline-svg').length + 1;
+        //     for (let i = 0; i < clonesNeeded; i++) {
+        //       timelineSvgInner.append(timelineSvgItem.clone());
+        //     }
+        //   }
+        // }
 
         const svg = $(this).find('.about-mil-svg');
         if(svg.length) {
@@ -1841,11 +1855,14 @@ const script = () => {
             scrub: true,
             onUpdate: (self) => {
               const p = self.progress;
-              console.log(p);
-              item.eq(0).find('.about-mil-card').toggleClass('active', p >= 0.30631);
-              item.eq(1).find('.about-mil-card').toggleClass('active', p >= 0.44261);
-              item.eq(2).find('.about-mil-card').toggleClass('active', p >= 0.57563);
-              item.eq(3).find('.about-mil-card').toggleClass('active', p >= 0.70826);
+              // item.eq(0).find('.about-mil-card').toggleClass('active', p >= 0.30631);
+              // item.eq(1).find('.about-mil-card').toggleClass('active', p >= 0.44261);
+              // item.eq(2).find('.about-mil-card').toggleClass('active', p >= 0.57563);
+              // item.eq(3).find('.about-mil-card').toggleClass('active', p >= 0.70826);
+              tagItem.eq(0).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.30631);
+              tagItem.eq(1).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.44261);
+              tagItem.eq(2).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.57563);
+              tagItem.eq(3).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.70826);
             }
           },
         });
@@ -1891,11 +1908,11 @@ const script = () => {
           ease: 'none',
         }, 0);
 
-        tlItem.to(timelineSvgInner, {
-          x: -translateX,
-          duration: slideDuration,
-          ease: 'none',
-        }, 0);
+        // tlItem.to(timelineSvgInner, {
+        //   x: -translateX,
+        //   duration: slideDuration,
+        //   ease: 'none',
+        // }, 0);
       }
       destroy() {
         super.destroy();
