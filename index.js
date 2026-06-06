@@ -1735,6 +1735,23 @@ const script = () => {
         console.log('about hero setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          timeline: gsap.timeline({
+            onStart: () => {
+              $('[data-init-hidden]').removeAttr('data-init-hidden');
+            }
+          }),
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $(this).find('.about-hero-tag').get(0) }),
+            new FadeSplitText({ el: $(this).find('.about-hero-title .txt').get(0), splitType: 'words' }),
+            new FadeIn({ el: $(this).find('.about-hero-btn').get(0) }),
+            new FadeIn({ el: $(this).find('.about-hero-link').get(0) }),
+            ...Array.from($('.about-hero-thumb-inner')).flatMap((el, idx) => [
+              new ScaleInset({ el: $(el).get(0), delay: idx * 0.25 }),
+            ]),
+          ]
+        });
       }
       interact() {
         this.heroAnimation();
@@ -1798,6 +1815,31 @@ const script = () => {
         console.log('about overview setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-overview-text-wrap'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new ScaleInset({ el: $('.about-overview-thumb-inner').get(0) }),
+            new FadeIn({ el: $('.about-overview-decor img').get(0), delay: 0.6 }),
+            new FadeIn({ el: $('.about-overview-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
+            new FadeSplitText({ el: $('.about-overview-text .txt').get(0), splitType: 'lines' }),
+          ]
+        });
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-overview-block'
+          },
+          allowMobile: true,
+          tweenArr: [
+            ...Array.from($('.about-overview-card')).flatMap((el, idx) => [
+              new FadeIn({ el: $(el).find('.about-overview-card-ic-2, .about-overview-card-ic-1').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.about-overview-card-title .txt').get(0), delay: idx * 0.25 }),
+              new FadeSplitText({ el: $(el).find('.about-overview-card-des .txt').get(0), delay: idx * 0.25 + 0.2 }),
+            ]),
+          ]
+        });
       }
       interact() {
       }
@@ -1818,6 +1860,20 @@ const script = () => {
         console.log('about text setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-text-main'
+          },
+          allowMobile: true,
+          tweenArr: [
+            ...Array.from($('.about-text-main .txt')).flatMap((el, idx) => [
+              new FadeSplitText({ el: el, splitType: 'words', delay: idx * 0.02 }),
+            ]),
+            ...Array.from($('.about-text-ic')).flatMap((el, idx) => [
+              new FadeIn({ el: $(el).get(0), delay: idx * 0.02 }),
+            ]),
+          ]
+        });
       }
       interact() {
       }
@@ -1838,6 +1894,16 @@ const script = () => {
         console.log('about mil setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-mil'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.about-mil-tag').get(0) }),
+            new FadeSplitText({ el: $('.about-mil-title .heading').get(0)}),
+          ]
+        });
       }
       interact() {
         this.animScrub();
@@ -1964,6 +2030,19 @@ const script = () => {
         console.log('about why setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-why-text-wrap'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.about-why-tag').get(0) }),
+            new FadeSplitText({ el: $('.about-why-title .heading').get(0) }),
+            new FadeSplitText({ el: $('.about-why-desc .txt').get(0) }),
+            new FadeIn({ el: $('.about-why-main').get(0) }),
+          ]
+        });
+
         const tlOverlap = gsap.timeline({
           scrollTrigger: {
             trigger: $(this).find('.about-why'),
@@ -2039,6 +2118,26 @@ const script = () => {
         console.log('about area setup');
       }
       animationReveal() {
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-area'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.about-area-tag').get(0) }),
+            new FadeSplitText({ el: $('.about-area-title .heading').get(0) }),
+          ]
+        });
+        new MasterTimeline({
+          scrollTrigger: {
+            trigger: '.about-area-main'
+          },
+          allowMobile: true,
+          tweenArr: [
+            new FadeIn({ el: $('.about-area-main').get(0) }),
+            new FadeSplitText({ el: $('.about-area-main-card-text .heading').get(0), delay: 0.4 }),
+          ]
+        });
       }
       interact() {
       }
