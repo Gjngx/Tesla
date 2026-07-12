@@ -1136,6 +1136,7 @@ const script = () => {
           this.setup();
           this.animationReveal();
           this.interact();
+          this.animScrub();
         }
       }
       setup() {
@@ -1170,6 +1171,22 @@ const script = () => {
         });
       }
       interact() {
+      }
+      animScrub(){
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.home-ib',
+            start: 'top bottom',
+            end: 'top center',
+            scrub: true
+          }
+        });
+
+        tl.to('.home-ib, .home-cur', {
+          backgroundColor: '#002c84',
+          ease: 'power3.inOut',
+        }, 0)
+
       }
       destroy() {
         super.destroy();
@@ -1880,22 +1897,8 @@ const script = () => {
       }
       animScrub(){
         const inner = $(this).find('.about-mil-slide-inner');
-        const item = $(this).find('.about-mil-item');
         const tags = $(this).find('.about-mil-timeline-tags-inner');
         const tagItem = $(this).find('.about-mil-timeline-tag-item');
-        // const timelineSvgInner = $(this).find('.about-mil-timeline-svgs-inner');
-
-        // const timelineSvgItem = timelineSvgInner.find('.about-mil-timeline-svg').first();
-        // if (timelineSvgItem.length && tags.length) {
-        //   const targetWidth = tags[0].scrollWidth;
-        //   const itemWidth = timelineSvgItem.outerWidth(true);
-        //   if (itemWidth > 0) {
-        //     const clonesNeeded = Math.ceil(targetWidth / itemWidth) - timelineSvgInner.find('.about-mil-timeline-svg').length + 1;
-        //     for (let i = 0; i < clonesNeeded; i++) {
-        //       timelineSvgInner.append(timelineSvgItem.clone());
-        //     }
-        //   }
-        // }
 
         const svg = $(this).find('.about-mil-svg');
         if(svg.length) {
@@ -1924,10 +1927,6 @@ const script = () => {
             scrub: true,
             onUpdate: (self) => {
               const p = self.progress;
-              // item.eq(0).find('.about-mil-card').toggleClass('active', p >= 0.30631);
-              // item.eq(1).find('.about-mil-card').toggleClass('active', p >= 0.44261);
-              // item.eq(2).find('.about-mil-card').toggleClass('active', p >= 0.57563);
-              // item.eq(3).find('.about-mil-card').toggleClass('active', p >= 0.70826);
               tagItem.eq(0).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.30631);
               tagItem.eq(1).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.44261);
               tagItem.eq(2).find('.about-mil-card-tag-text').toggleClass('active', p >= 0.57563);
@@ -1964,24 +1963,21 @@ const script = () => {
         }
 
         const translateX = (inner.width() + winWidth);
-
+        const titleLeft = $('.about-mil-title').length ? $('.about-mil-title')[0].getBoundingClientRect().left : 0;
+        const itemWidth = $(this).find('.about-mil-item').length ? $(this).find('.about-mil-item').outerWidth() : 0;
+        
+        console.log(translateX, titleLeft, itemWidth);
         tlItem.to(inner, {
-          x: - translateX,
+          x: -(translateX - (titleLeft + itemWidth)),
           duration: slideDuration,
           ease: 'none',
         }, 0);
 
         tlItem.to(tags, {
-          x: -translateX,
+          x: -(translateX - (titleLeft + itemWidth)),
           duration: slideDuration,
           ease: 'none',
         }, 0);
-
-        // tlItem.to(timelineSvgInner, {
-        //   x: -translateX,
-        //   duration: slideDuration,
-        //   ease: 'none',
-        // }, 0);
       }
       destroy() {
         super.destroy();
