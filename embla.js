@@ -328,15 +328,14 @@ class TweenSplitText {
 
         const prevIdx = this.lastIndex
 
-        const scrollDown = currentIndex > prevIdx
-        const prevY = scrollDown ? -100 : 100
+        const prevY = -100
 
         if (this.splitTextCache[currentIndex]) {
             const words = this.splitTextCache[currentIndex].words
             
             if (words.length) {
                 gsap.killTweensOf(words)
-                gsap.set(words, { yPercent: scrollDown ? 100 : -100, opacity: 0 })
+                gsap.set(words, { yPercent: 100, opacity: 0 })
                 gsap.to(words, {
                     yPercent: 0,
                     opacity: 1,

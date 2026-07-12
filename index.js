@@ -1486,7 +1486,7 @@ const script = () => {
           tweenArr: [
             new FadeIn({ el: $('.home-testi-tag').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 } }),
             new FadeIn({ el: $('.home-testi-ic-inner').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }}),
-            new FadeSplitText({ el: $('.home-testi-slide-text-item .txt').get(0), splitType: 'lines'}),
+            new FadeIn({ el: $('.home-testi-slide-text-item').get(0)}),
             new ScaleInset({ el: $('.home-testi-avatar-slide-img').get(0)}),
             new ScaleInset({ el: $('.home-testi-avatar-slide-img').get(1) }),
             new FadeIn({ el: $('.home-testi-pagi').get(0), from: { y: cvUnit(10, 'rem'), x: cvUnit(5, 'rem') }, to: { y: 0, x: 0 }, delay: 0.4 }),
@@ -1513,10 +1513,15 @@ const script = () => {
         const pagiNumber = $(this).find('[data-pagi="number"]');
         const pagiTotal = $(this).find('[data-total="number"]');
 
-        this.emblaApi = EmblaCarousel(slidesInner, {}, [
+        this.emblaApi = EmblaCarousel(slidesInner, { loop: true }, [
           EmblaCarouselFade(),
           EmblaCarouselAutoplay({ delay: 5000, stopOnInteraction: false })
         ]);
+
+        this.tweenSplitText = new TweenSplitText(this.emblaApi, {
+          duration: 0.3,
+          titleSelector: '.home-testi-slide-text-item .txt'
+        });
 
         const slidesName = $(this).find('.home-testi-name-slide').get(0);
         if (slidesName) {
@@ -1524,9 +1529,14 @@ const script = () => {
           $(slidesName).find('.home-testi-name-slide-inner').addClass('embla__container');
           $(slidesName).find('.home-testi-name-slide-item').addClass('embla__slide');
 
-          this.emblaApiName = EmblaCarousel(slidesName, {}, [
+          this.emblaApiName = EmblaCarousel(slidesName, { loop: true }, [
             EmblaCarouselFade()
           ]);
+
+          this.tweenSplitTextName = new TweenSplitText(this.emblaApiName, {
+            duration: 0.3,
+            titleSelector: '.home-testi-name-text .label, .home-testi-name-pos .label'
+          });
 
           const syncMainToName = () => {
             if (this.emblaApiName && this.emblaApi) {
@@ -1555,7 +1565,7 @@ const script = () => {
           $(slidesAvatar).find('.home-testi-avatar-slide-inner').addClass('embla__container');
           $(slidesAvatar).find('.home-testi-avatar-slide-item').addClass('embla__slide');
 
-          this.emblaApiAvatar = EmblaCarousel(slidesAvatar);
+          this.emblaApiAvatar = EmblaCarousel(slidesAvatar, { loop: true });
 
           const syncMainToAvatar = () => {
             if (this.emblaApiAvatar && this.emblaApi) {
@@ -1576,46 +1586,6 @@ const script = () => {
           this.emblaApi.on('select', syncMainToAvatar);
           this.emblaApiAvatar.on('select', syncAvatarToMain);
         }
-
-        // Setup Background Slider
-        // const slidesBg = $(this).find('.home-testi-bg-slide').get(0);
-        // if (slidesBg) {
-        //   const bgInner = $(slidesBg).find('.home-testi-bg-slide-inner');
-        //   const bgItem = $(slidesBg).find('.home-testi-bg-slide-item').first();
-
-        //   if (bgInner.length && bgItem.length && this.emblaApi) {
-        //     const totalSlides = this.emblaApi.scrollSnapList().length;
-        //     const currentCount = bgInner.find('.home-testi-bg-slide-item').length;
-        //     for (let i = currentCount; i < totalSlides; i++) {
-        //       bgInner.append(bgItem.clone());
-        //     }
-        //   }
-
-        //   $(slidesBg).addClass('embla__viewport');
-        //   $(slidesBg).find('.home-testi-bg-slide-inner').addClass('embla__container');
-        //   $(slidesBg).find('.home-testi-bg-slide-item').addClass('embla__slide');
-
-        //   this.emblaApiBg = EmblaCarousel(slidesBg);
-
-        //   const syncMainToBg = () => {
-        //     if (this.emblaApiBg && this.emblaApi) {
-        //       if (this.emblaApiBg.selectedScrollSnap() !== this.emblaApi.selectedScrollSnap()) {
-        //         this.emblaApiBg.scrollTo(this.emblaApi.selectedScrollSnap());
-        //       }
-        //     }
-        //   };
-
-        //   const syncBgToMain = () => {
-        //     if (this.emblaApiBg && this.emblaApi) {
-        //       if (this.emblaApi.selectedScrollSnap() !== this.emblaApiBg.selectedScrollSnap()) {
-        //         this.emblaApi.scrollTo(this.emblaApiBg.selectedScrollSnap());
-        //       }
-        //     }
-        //   };
-
-        //   this.emblaApi.on('select', syncMainToBg);
-        //   this.emblaApiBg.on('select', syncBgToMain);
-        // }
 
         if (prevBtn && nextBtn) {
           this.prevNextButtons = new PrevNextButtons(this.emblaApi, prevBtn, nextBtn);
