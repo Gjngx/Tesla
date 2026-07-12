@@ -350,11 +350,17 @@ class TweenSplitText {
 
             if (prevWords.length) {
                 gsap.killTweensOf(prevWords)
+                
+                let outStagger = this.stagger;
+                if (gsap.getProperty(prevWords[prevWords.length - 1], "opacity") < 0.99) {
+                    outStagger = 0;
+                }
+
                 gsap.to(prevWords, {
-                    yPercent: prevY,
+                    yPercent: -100,
                     opacity: 0,
                     duration: this.duration,
-                    stagger: this.stagger,
+                    stagger: outStagger,
                 })
             }
         }
